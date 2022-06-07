@@ -1,0 +1,534 @@
+199c199
+< void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+---
+> /*void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+276a277,786
+> */
+> 
+> int comparreference(const void *x, const void *y, void *patt)
+> {
+>     return strcmp(&((char*)patt)[*((uint64_t *)x)], &((char*)patt)[*((uint64_t *)y)]);
+> }
+> 
+> extern uint64_t COUNT;
+> 
+> void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+> 
+> 	//cout << "RelzIndex::findTimes - Start (\"" << pattern << "\")" << COUNT++ << endl;
+> 	NanoTimer timer;
+> 	
+> //	cout << "RelzIndex::findTimes - Section A, reference\n";
+> 	
+> 	size_t m = pattern.size();
+> 	size_t occs = sdsl::count(fm_index, pattern.begin(), pattern.end());
+> 	occs_a += occs;
+> 	vector<int_vector<64>> arr_locations;
+> 	if( occs > 0 ){
+> 		arr_locations.push_back(locate(fm_index, pattern.begin(), pattern.begin()+m));
+> 		sort(arr_locations.back().begin(), arr_locations.back().end());
+> 	}
+> 	querytime_p1 += timer.getNanosec();
+> 	timer.reset();
+> 
+> 	for( int_vector<64> locations : arr_locations ){
+> 		for( unsigned int i = 0; i < occs; ++i ){
+> 			unsigned int occ_i = locations[i];
+> 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
+> 			unsigned int select = select0_s(occ_i + 1);
+> 			unsigned int pos_ez = select - 1 - occ_i;
+> 			// Now the recursive search in rmq (0 - pos_ez)
+> 			if( occ_i >= select ){
+> 				continue;
+> 			}
+> //
+>             unsigned int tu, pu, lu;
+>             unsigned int pos_max = pos_ez;
+>             if( precompute_rmq ){
+>                 tu = arr_tu[pos_max];
+>                 pu = arr_pu[pos_max];
+>                 lu = arr_lu[pos_max];
+>             }
+>             else {
+>                 tu = select1_s(pos_max + 1) - pos_max;
+>                 pu = select1_b(pi[pos_max] + 1);
+>                 lu = select1_b(pi[pos_max] + 2) - pu;
+>             }
+> 
+>             unsigned int cant_iters = pos_ez;
+>             unsigned int a = 0, ncases = 0, niters;
+>             bool found = true;
+>             unsigned int occim = occ_i+m;
+>             
+>             while (a < cant_iters && found) {
+>                 niters = 0;
+>                 found = false;
+>                 while (a < cant_iters && niters < 2/*ncases < 15*/ /*tu+lu-1 >= occ_i+m-1*/) {
+>                     if (tu+lu >= occim/*occ_i+m*/) {
+>                         occs_b++;
+>                         results.push_back(pu + (occ_i+m - tu));
+>                         found = true;
+>                         //COUNT++;
+>                     }
+>                     else {
+>                         ncases++;
+>                     }
+>                     pos_max--;
+>                     //COUNT++;
+>                     //cout << "itera.." << endl;
+>                     if( precompute_rmq ){
+>                         tu = arr_tu[pos_max];
+>                         pu = arr_pu[pos_max];
+>                         lu = arr_lu[pos_max];
+>                     }
+>                     else {
+>                         tu = select1_s(pos_max + 1) - pos_max;
+>                         pu = select1_b(pi[pos_max] + 1);
+>                         lu = select1_b(pi[pos_max] + 2) - pu;
+>                     }
+>                     a++;
+>                     niters++;
+>                 }
+>             }
+> 			if (a < pos_ez) recursive_rmq(0, pos_max/*pos_ez*/, (occ_i + m), occ_i, results);
+> 		}
+> 	}
+> 	querytime_p2 += timer.getNanosec();
+> 	//cout << COUNT << endl;
+>     //	cout << "RelzIndex::findTimes - Section B, ranges\n";
+> 
+>     /*****/
+>     uint64_t patt_len = pattern.size();
+>     char/***/ patt/*= new char*/[patt_len+1];
+>     char/***/ patt_2/*= new char*/[patt_len+2];
+>     char/***/ patt_rev/*= new char*/[patt_len+1];
+>     char/***/ patt_rev_2/*= new char*/[patt_len+2];
+>     
+>     for (uint64_t a=0; a < patt_len; a++) {
+>         patt[a]     = pattern[a];
+>         patt_2[a]   = pattern[a];
+>         patt_rev[a] = pattern[patt_len-1-a];
+>         patt_rev_2[a] = pattern[patt_len-1-a];
+>     }
+> 
+>     patt[patt_len]     = '\0';
+>     patt_2[patt_len]   = 'U';
+>     patt_rev[patt_len] = '\0';
+>     patt_rev_2[patt_len] = 'U';
+>     
+>     uint64_t /***/suff_y/* = new uint64_t*/[patt_len];
+>     uint64_t /***/suff_y_2/* = new uint64_t*/[patt_len];
+>     uint64_t /***/suff_x/* = new uint64_t*/[patt_len];
+>     uint64_t /***/suff_x_2/* = new uint64_t*/[patt_len];
+> 
+>     for (uint64_t a=0; a < patt_len; a++) {
+>         suff_y[a] = a;
+>         suff_y_2[a] = a;
+>         suff_x[a] = a;
+>         suff_x_2[a] = a;  
+>     }
+>     
+>     qsort_r(suff_y+1, patt_len-1, sizeof(uint64_t), comparreference, patt);
+>     qsort_r(suff_y_2+1, patt_len-1, sizeof(uint64_t), comparreference, patt_2);
+>     qsort_r(suff_x+1, patt_len-1, sizeof(uint64_t), comparreference, patt_rev); 
+>     qsort_r(suff_x_2+1, patt_len-1, sizeof(uint64_t), comparreference, patt_rev_2); 
+> 
+>     /*printf("******************** Sorted suffixes ********************\n");
+>     for (uint64_t a = 0; a < patt_len; a++)
+>         printf("%s\n", &patt_2[suff_y_2[a]]);
+>     printf("*********************************************************\n");
+> 
+>     getchar ();
+>     */
+>     unsigned int /***/first_coord_x/* = new uint64_t*/[patt_len];
+>     unsigned int /***/second_coord_x/* = new uint64_t*/[patt_len];
+>     unsigned int /***/first_coord_y/* = new uint64_t*/[patt_len];
+>     unsigned int /***/second_coord_y/* = new uint64_t*/[patt_len];
+> 
+>     unsigned int /***/result_first_x[patt_len], /***/result_first_y[patt_len];
+>     unsigned int /***/result_second_x[patt_len], /***/result_second_y[patt_len];
+> 
+>     getRangesX(0, n_factors-1, suff_x, 1, patt_len-1, first_coord_x, patt_rev, patt_len-1, 0, false); 
+>     getRangesX(0, n_factors-1, suff_x_2, 1, patt_len-1, second_coord_x, patt_rev_2, patt_len-1, 0, true); 
+> 
+>     bool flags1[patt_len], flags2[patt_len];
+>     uint64_t b=0;
+> 
+>     for (uint64_t a = 0; a < patt_len; a++) {
+>         result_first_x[patt_len-suff_x[a]] = first_coord_x[a];
+>         result_second_x[patt_len-suff_x_2[a]] = second_coord_x[a];
+>         if (first_coord_x[a] == (unsigned int)(-1) || second_coord_x[a] == (unsigned int)(-1) || first_coord_x[a] > second_coord_x[a]) {
+>             flags1[patt_len-suff_x[a]] = false;
+>             flags2[patt_len-suff_x_2[a]] = false;
+>         }
+>         else {
+>             flags1[patt_len-suff_x[a]] = true;
+>             flags2[patt_len-suff_x_2[a]] = true;
+>             b++;
+>         }
+>     }
+> 
+>     getRangesY(0, n_factors-1, suff_y, 1, patt_len-1, first_coord_y, patt, patt_len-1, flags1, false); 
+>     getRangesY(0, n_factors-1, suff_y_2, 1, patt_len-1, second_coord_y, patt_2, patt_len-1, flags2, true); 
+> 
+>     for (uint64_t a = 0; a < patt_len; a++) {
+>         result_first_y[suff_y[a]] = first_coord_y[a]; 
+>         result_second_y[suff_y_2[a]] = second_coord_y[a]; 
+>     }
+> 
+>     querytime_p3 += timer.getNanosec();
+>     timer.reset();
+>         
+>     /*****/
+>     //if (pattern.length() > 1000)
+>     for(unsigned int i = 1; i < pattern.length(); ++i){
+> 		// Rango X
+> 	pair<unsigned int, unsigned int> r1; // = getRangeX(p1_rev.c_str());
+> 	timer.reset();
+> 
+>         /*if (result_first_x[i] != r1.first) cout << "X first " << result_first_x[i] << " " << r1.first << " " << r1.second << endl; 
+>         if (result_second_x[i]-1 != r1.second) cout << "X second " << result_second_x[i] << " " << r1.first << " " << r1.second << endl; 
+>         */
+> 
+>         r1.first = result_first_x[i];
+>         r1.second = result_second_x[i]/*-1*/;
+>         
+> 	if( r1.first == (unsigned int)(-1) || r1.second == (unsigned int)(-1) || r1.second < r1.first )
+>             continue;
+> 
+> 	// Rango Y
+> 	pair<unsigned int, unsigned int> r2;// = getRangeY(p2.c_str());
+> 
+>         /*if (result_first_y[i] != r2.first) cout << "Y first " << result_first_y[i] << " " << r2.first << " " << r2.second << endl; 
+>         if (result_second_y[i] != r2.second) {
+>             cout << "Y second " << result_first_y[i] << " " << result_second_y[i] << " " << r2.first << " " << r2.second << endl;
+>             //cout << "        >> " << p2.c_str() << " " << extract_str_Y(result_first_y[i], patt_len) << " vs " << extract_str_Y(result_second_y[i], patt_len) << endl; 
+>         } */ 
+> 
+>         r2.first = result_first_y[i];
+>         r2.second = result_second_y[i]/*-1*/;
+>         
+> 	if( r2.first == n_factors+1 || r2.second == n_factors+1 || r2.second < r2.first )
+> 	    continue;
+> 
+>         auto res = wt.range_search_2d(r1.first, r1.second, r2.first, r2.second);
+> 	for (auto point : res.second){
+> 	    unsigned int f = arr_y[point.second];
+> 	    unsigned int pu = select1_b(f + 1);
+> 	    results.push_back(pu - i/*p1.length()*/);
+> 	    ++occs_c;
+> 	}	
+> 	querytime_p4 += timer.getNanosec();
+>     }
+> 	//cout << "RelzIndex::findTimes - End\n";
+> }
+> 
+> 
+> #define LEVEL_B_SEARCH 19
+> 
+> int RelzIndexReference::compare_str_Y(char* pattern, char *str_mid, FactorsIteratorCompacted &it) 
+> {
+>     uint64_t i;
+>     
+>     for (i=0; str_mid[i] && pattern[i] && str_mid[i]==pattern[i]; ++i);
+> 
+>     if (str_mid[i]==0 && pattern[i]!=0) {
+>         if (it.hasNext()) {
+>             str_mid[i] = it.next();
+>             while (pattern[i] && str_mid[i]==pattern[i] && it.hasNext()) {
+>                 i++;
+>                 str_mid[i] = it.next();
+>             }
+>         }
+>     }
+> 
+>     return pattern[i] - str_mid[i];
+> }
+> 
+> 
+> int RelzIndexReference::compare_str_X(char* pattern, char *str_mid, FactorsIteratorCompactedReverse &it) 
+> {
+>     uint64_t i;
+>     
+>     for (i=0; str_mid[i] && pattern[i] && str_mid[i]==pattern[i]; ++i);
+> 
+>     if (str_mid[i]==0 && pattern[i]!=0) {
+>         if (it.hasNext()) {
+>             str_mid[i] = it.next();
+>             while (pattern[i] && str_mid[i]==pattern[i] && it.hasNext()) {
+>                 i++;
+>                 str_mid[i] = it.next();
+>             }
+>         }
+>     }
+> 
+>     return pattern[i] - str_mid[i];
+> }
+> 
+> 
+> int compare_str_Y_2(char* pattern, char *str_mid, FactorsIteratorCompacted &it)
+> {
+>     uint64_t i;
+> 
+>     for (i=0; str_mid[i] && pattern[i] && str_mid[i]==pattern[i]; ++i);
+> 
+>     if (str_mid[i]==0 && pattern[i]!=0) {
+>         if (it.hasNext()) {
+>             str_mid[i] = it.next();
+>             while (pattern[i] && str_mid[i]==pattern[i] && it.hasNext()) {
+>                 i++;
+>                 str_mid[i] = it.next();
+>             }
+>         }
+>     }
+> 
+>     return pattern[i] - str_mid[i];
+> }
+> 
+> int compare_str_X_2(char* pattern, char *str_mid, FactorsIteratorCompactedReverse &it)
+> {
+>     uint64_t i;
+> 
+>     for (i=0; str_mid[i] && pattern[i] && str_mid[i]==pattern[i]; ++i);
+> 
+>     if (str_mid[i]==0 && pattern[i]!=0) {
+>         if (it.hasNext()) {
+>             str_mid[i] = it.next();
+>             while (pattern[i] && str_mid[i]==pattern[i] && it.hasNext()) {
+>                 i++;
+>                 str_mid[i] = it.next();
+>             }
+>             if (!it.hasNext()) i++;
+>         }
+>     }
+> 
+>     if (pattern[i] == 0 && str_mid[i] != 0) return 0;
+>     //else return strcmp(pattern, str_mid);/*
+>     //if (pattern[i] == '\0' && str_mid[i] == 0) return 0;
+>     else if (pattern[i] == 'U' && str_mid[i] == '\0')
+>         return 0;
+>     else if (str_mid[i+1] == '\0') return 1;
+>     else return pattern[i] - str_mid[i];
+> }
+> 
+> 
+> 
+> 
+> void RelzIndexReference::getRangesY(uint64_t Y_l, uint64_t Y_r, uint64_t* suff, 
+>                            uint64_t left, uint64_t right, unsigned int* output,
+>                            char *pattern, uint64_t patt_len, bool *flags, bool isright) 
+> {
+>     if ((int64_t)left > (int64_t)right) return;
+>     else if (Y_l == Y_r) {
+>        if (Y_l == n_factors-1) {
+>             for (uint64_t i = left; i <= right; i++)
+>                 if (!flags[suff[i]])
+>                     output[i] = n_factors+1;
+>                 else
+>                     output[i] = Y_l;
+>             return;
+> 
+>         }
+>         else {
+>             char str_mid[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+>             if (isright && Y_l > 0) Y_l--;
+> 
+>             FactorsIteratorCompacted it(arr_y[Y_l], n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, ref_text, len_text);
+>             it.setMaxLength(patt_len);
+>             int res;
+>             for (uint64_t i = left; i <= right; i++) {
+>                 if (!flags[suff[i]]) {
+>                     output[i] = n_factors+1;
+>                     continue;
+>                 }
+>                 res = compare_str_Y_2(&pattern[suff[i]], str_mid, it);
+> 
+>                 if (!isright) {
+>                     output[i] = Y_l;
+>                 }
+>                 else {
+>                     output[i] = Y_l+(res<=0);
+>                 }
+>             }
+>             return;
+>         }
+> 
+> /*        if (Y_l == n_factors-1) Y_l++;
+>         for (uint64_t i = left; i <= right; i++)
+>             output[i] = Y_l; 
+>         return;
+> */
+>     }
+>     else {
+>         char str_mid[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+> 
+>         uint64_t Y_mid = (Y_l+Y_r)/2; 
+>         FactorsIteratorCompacted it(arr_y[Y_mid], n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, ref_text, len_text);
+> 
+>         if(it.length() == 0 ){
+>             cout << "Cuidado que retorna por aquí Y" << endl;
+>             fflush(stdout);
+> 		    return; // OJO con esto
+> 	    }
+> 	    it.setMaxLength(patt_len);
+> 
+>         uint64_t a;
+>         int64_t b;
+>         uint64_t l = left, r = right, med;
+> 
+>         while (r-l+1 > 3) {
+>             med = (r+l)/2;
+>             if (compare_str_Y(&pattern[suff[med]], str_mid, it) <= 0)
+>                 l = med+1; //left = med + 1; //(right-left+1)/2 + 1;
+>             else
+>                 r = med; //right = med;//a = left;
+>         }
+>         a = l;
+>         for (b=a-1; a <= right; a++) {
+>             if(!flags[suff[a]]) {
+>                 output[a] = n_factors + 1;
+>                 continue;
+>             }
+>             if (compare_str_Y(&pattern[suff[a]], str_mid, it) > 0) break;
+>             b = a;
+>         }
+>         getRangesY(Y_l, Y_mid, suff, left,b/*a-1*/, output, pattern, patt_len, flags, isright);
+>         getRangesY(Y_mid+1, Y_r, suff, a, right, output, pattern, patt_len, flags, isright);
+> 
+> /*       if (compare_str_Y(&pattern[suff[(right-left+1)/2]], str_mid, it) <= 0) 
+>             a = (right-left+1)/2+1;
+>         else 
+>             a = left;
+> 
+>         for (; a <= right && compare_str_Y(&pattern[suff[a]], str_mid, it) <= 0; a++);
+>         
+>         getRangesY(Y_l, Y_mid, suff, left, a-1, output, pattern, patt_len);
+>         getRangesY(Y_mid+1, Y_r, suff, a, right, output, pattern, patt_len);
+> */
+>     }
+> }
+> 
+> 
+> void RelzIndexReference::getRangesX(uint64_t Y_l, uint64_t Y_r, uint64_t* suff, 
+>                            uint64_t left, uint64_t right, unsigned int * output,
+>                            char *pattern, uint64_t patt_len, uint64_t level, bool isright) 
+> {
+>     if ((int64_t)left > (int64_t)right) return;
+>     else if (Y_l == Y_r) {
+>         if (Y_l == n_factors-1) {
+>             Y_l++;
+>             for (uint64_t i = left; i <= right; i++)
+>                 output[i] = Y_l-1;
+>         }
+>         else {
+>             uint64_t pos;
+>             char str_mid[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+>             if (Y_l > 0 && isright) Y_l--;
+> 
+>             if (level < LEVEL_B_SEARCH)
+>                 pos = arr_x[Y_l];
+>             else
+>                 pos = arr_y[wt[Y_l]];  // We use WT + Y to reproduce X (which is not stored)
+>             //cout << "Despues" << endl; fflush(stdout);
+> 
+>             FactorsIteratorCompactedReverse it(pos-1, n_factors, &select1_s, &select1_b,
+>                                       &select0_b, &pi_inv, ref_text, len_text);
+>             if(it.length() == 0 ){
+>                for (uint64_t i = left; i <= right; i++) output[i] = (unsigned int)-1;
+>                return; // OJO con esto
+>             }
+> 
+>             it.setMaxLength(patt_len);
+>             int res;
+>             for (uint64_t i = left; i <= right; i++) {
+>                 res = compare_str_X_2(&pattern[suff[i]], str_mid, it);
+> 
+>                 if (!isright) {
+>                     output[i] = Y_l;
+>                 }
+>                 else {
+>                     if (res <= 0) Y_l++;
+>                     output[i] = Y_l;
+>                 }
+> 
+>             }
+>         }
+>         return;
+> /*        if (Y_l == n_factors-1) Y_l++;
+>         for (uint64_t i = left; i <= right; i++)
+>             output[i] = Y_l; 
+>         return;
+> */
+>     }
+>     else {
+>         char str_mid[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+>             
+>         uint64_t Y_mid = (Y_l+Y_r)/2; 
+>         uint64_t pos;
+>         
+>         //if (pos == 0) return NULL;
+>         if (level < LEVEL_B_SEARCH) 
+>             pos = arr_x[Y_mid];	
+> 	else 
+> 	    pos = arr_y[wt[Y_mid]];  // We use WT + Y to reproduce X (which is not stored)
+>         
+>         FactorsIteratorCompactedReverse it(pos-1, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, ref_text, len_text);
+> 
+>         if(it.length() == 0 ){
+>             //cout << "Cuidado que retorna por aquí X" << endl;
+>             //fflush(stdout);
+>             //for (uint64_t i = left; i <= right; i++) output[i] = (unsigned int) -1;
+> 	    return; // OJO con esto
+> 	}
+> 	it.setMaxLength(patt_len);
+> 
+>         uint64_t a;
+>         uint64_t l = left, r = right, med;
+> 
+>         while (r-l+1 > 3) {
+>             med = (r+l)/2;
+>             if (compare_str_X(&pattern[suff[med]], str_mid, it) <= 0)
+>                 l = med+1;
+>             else
+>                 r = med;
+>         }
+>         a = l;
+> 
+>         for (; a <= right && compare_str_X(&pattern[suff[a]], str_mid, it) <= 0; a++);
+> 
+>         getRangesX(Y_l, Y_mid, suff, left, a-1, output, pattern, patt_len,level+1,isright);
+>         getRangesX(Y_mid+1, Y_r, suff, a, right, output, pattern, patt_len,level+1,isright);
+> 
+> 
+> /*        if (compare_str_X(&pattern[suff[(right-left+1)/2]], str_mid, it) <= 0)
+>             a = (right-left+1)/2 + 1;
+>         else 
+>             a = left;
+> 
+>         for (; a <= right && compare_str_X(&pattern[suff[a]], str_mid, it) <= 0; a++);
+>         
+>         getRangesX(Y_l, Y_mid, suff, left, a-1, output, pattern, patt_len,level+1);
+>         getRangesX(Y_mid+1, Y_r, suff, a, right, output, pattern, patt_len,level+1);
+> */
+>     }
+> }
+> 
+> 
+430,431d939
+< #define LEVEL_BINARY_SEARCH 20
+< 
+449c957
+< 		if (level < LEVEL_BINARY_SEARCH) { 
+---
+> 		if (level < 0) { 
+466c974
+<    if (level < LEVEL_BINARY_SEARCH) fm = arr_x[izq];	
+---
+>    if (level == 20) fm = arr_x[izq];	
+481c989
+< 		if (level < LEVEL_BINARY_SEARCH) {
+---
+> 		if (level < 0) {
+498c1006
+< 	if (level < LEVEL_BINARY_SEARCH) fm = arr_x[der];
+---
+> 	if (level == 20) fm = arr_x[der];
