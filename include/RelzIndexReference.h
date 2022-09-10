@@ -79,7 +79,7 @@ public:
 	
 	void findTimes(const string &pattern, vector<unsigned int> &results);
 	
-	void printSize();
+	double getSize();
 	
 	void save(const string &file_base);
 	

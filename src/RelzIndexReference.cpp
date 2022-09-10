@@ -504,43 +504,44 @@ pair<unsigned int, unsigned int> RelzIndexReference::getRangeX(const char *patte
 	return pair<unsigned int, unsigned int>(izq, der);
 }
 
-void RelzIndexReference::printSize(){
+double RelzIndexReference::getSize(){
 	double total_bytes = 0;
 	
 	// texto descomprimido
 	unsigned int len_ref = ref_text->length();
 	total_bytes += len_ref/4;
-	cout << "RelzIndexReference::printSize - Reference Text: " << (2.0*len_ref/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - Reference Text: " << (2.0*len_ref/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(fm_index);
-	cout << "RelzIndexReference::printSize - fm_index: " << (8.0*size_in_bytes(fm_index)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - fm_index: " << (8.0*size_in_bytes(fm_index)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(rmq);
-	cout << "RelzIndexReference::printSize - rmq: " << (8.0*size_in_bytes(rmq)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - rmq: " << (8.0*size_in_bytes(rmq)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(bits_s);
-	cout << "RelzIndexReference::printSize - bits_s: " << (8.0*size_in_bytes(bits_s)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - bits_s: " << (8.0*size_in_bytes(bits_s)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(bits_b);
-	cout << "RelzIndexReference::printSize - bits_b: " << (8.0*size_in_bytes(bits_b)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - bits_b: " << (8.0*size_in_bytes(bits_b)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(pi);
-	cout << "RelzIndexReference::printSize - pi: " << (8.0*size_in_bytes(pi)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - pi: " << (8.0*size_in_bytes(pi)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(pi_inv);
-	cout << "RelzIndexReference::printSize - pi_inv: " << (8.0*size_in_bytes(pi_inv)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - pi_inv: " << (8.0*size_in_bytes(pi_inv)/len_text) << " bps\n";
 	
 	//total_bytes += size_in_bytes(arr_x);
-	//cout << "RelzIndexReference::printSize - arr_x: " << (8.0*size_in_bytes(arr_x)/len_text) << " bps\n";
+	//cout << "RelzIndexReference::getSizeInMB - arr_x: " << (8.0*size_in_bytes(arr_x)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(arr_y);
-	cout << "RelzIndexReference::printSize - arr_y: " << (8.0*size_in_bytes(arr_y)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - arr_y: " << (8.0*size_in_bytes(arr_y)/len_text) << " bps\n";
 	
 	total_bytes += size_in_bytes(wt);
-	cout << "RelzIndexReference::printSize - wt: " << (8.0*size_in_bytes(wt)/len_text) << " bps\n";
+	cout << "RelzIndexReference::getSizeInMB - wt: " << (8.0*size_in_bytes(wt)/len_text) << " bps\n";
 	
-	cout << "RelzIndexReference::printSize - Total " << total_bytes/(1024*1024) << " MB (" << (8.0*total_bytes/len_text) << " bps)\n";
+	cout << "RelzIndexReference::getSizeInMB - Total " << total_bytes/(1024*1024) << " MB (" << (8.0*total_bytes/len_text) << " bps)\n";
 	
+	return total_bytes;
 }
 
 void RelzIndexReference::save(const string &file_base){
