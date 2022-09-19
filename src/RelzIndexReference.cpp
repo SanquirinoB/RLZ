@@ -293,8 +293,19 @@ void RelzIndexReference::recursive_rmq(unsigned int ini, unsigned int fin, unsig
 	else{
 		tu = select1_s(pos_max + 1) - pos_max;
 		pu = select1_b(pi[pos_max] + 1);
-		lu = select1_b(pi[pos_max] + 2) - pu;
+		// cout << "pi(t) = " << pi[pos_max] << endl;
+
+		if(pi[pos_max] + 1 < n_factors)
+		{
+			lu = select1_b(pi[pos_max] + 2) - pu;
+		} 
+		else 
+		{
+			lu = bits_b.size() - pu;
+		}
 	}
+
+	// cout << "tu = " << tu << ", pu = " << pu << ", lu = " << lu  << ", min_pos = " << min_pos << endl;
 	
 //	cout << "RelzIndexReference::recursive_rmq - tu: " << tu << ", pu: " << pu << ", lu: " << lu << "\n";
 	
