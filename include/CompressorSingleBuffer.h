@@ -26,16 +26,16 @@ private:
 //	mutex mutex_interno;
 //	TextFilter *filter;
 	
-	unsigned int cur_block;
-	unsigned int cur_block_size;
-	unsigned int buffer_size;
+	unsigned long long cur_block;
+	unsigned long long cur_block_size;
+	unsigned long long buffer_size;
 	//Buffer interno
 	char *buffer;
 	//Clon del buffer para procesos de ajustes (de modo que pueda reusarse el buff de last block)
 	char *adjust_buffer;
 	
 	//Resetea y extiende los buffers solo si new_size es mayor a buffer_size
-	void prepareBuffer(unsigned int new_size);
+	void prepareBuffer(unsigned long long new_size);
 	
 public: 
 	CompressorSingleBuffer();
@@ -45,18 +45,18 @@ public:
 	// Extrae texto comprimido
 	// Escribe length chars desde la posicion absoluta pos_ini en buff (asume al menos length + 1 chars de espacio)
 	// Retorna el largo del texto escrito (igual a strlen de buff)
-	unsigned int read(unsigned long long pos_ini, unsigned int length, char *out_buff);
+	unsigned long long read(unsigned long long pos_ini, unsigned long long length, char *out_buff);
 	
 	// Escribe texto recomprimiendo los bloques involucrados
 	// ESTO AUN NO ESTA TOTALMENTE IMPLEMENTADO
-	unsigned int write(const char *text, unsigned int length, unsigned long long pos_ini);
+	unsigned long long write(const char *text, unsigned long long length, unsigned long long pos_ini);
 	
 	// Descompresion completa del master_file asociado a este compressor
 	// Escribe el texto descomprimido en out_file (en lineas de un cierto largo)
 	// Eventualmente line_size sera removida
 	// Datos como eso de ser necesarios, estaran en los metadatos de BlockHeaders del Coder/Decoder
 	// Retorna true en exito, false en caso de fallo
-	bool decompress(const char *out_file, unsigned int line_size = 70);
+	bool decompress(const char *out_file, unsigned long long line_size = 70);
 	
 	// Este metodo debe recargar al decoder y dejar al compresor en estado inicial
 	// Eso puede implicar resetear buffers y otras variables de estado

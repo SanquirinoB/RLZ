@@ -34,23 +34,23 @@ public:
 	//Asume que el buff tiene al menos getBlockSize() + 1 bytes
 	//Retorna el tamaño efectivo del bloque, getBlockSize() salvo por el ultimo
 	//Omite block_pos fuera de rango (lo verifica)
-	virtual unsigned int decodeBlock(unsigned int block_pos, char *buff);
+	virtual unsigned long long decodeBlock(unsigned long long block_pos, char *buff);
 	
 	//Metodo directo de headers (no es necesario redefinirlo)
 	virtual unsigned long long getTextSize();
 	
 	//Metodo directo de headers (no es necesario redefinirlo)
-	virtual unsigned int getBlockSize();
+	virtual unsigned long long getBlockSize();
 	
 	//Metodo directo de headers (no es necesario redefinirlo)
-	virtual unsigned int getNumBlocks();
+	virtual unsigned long long getNumBlocks();
 	
 	//Metodo directo de headers (no es necesario redefinirlo)
 	virtual BlockHeaders *getHeaders();
 	
 	//Este metodo retorna un NUEVO objeto headers del tipo correcto
 	//Usa los argumentos en la creacion del header
-	virtual BlockHeaders *getNewHeaders(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata = NULL);
+	virtual BlockHeaders *getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata = NULL);
 	
 	//Retorna un puntero a un nuevo Decoder del mismo tipo
 	//Adicionalmente podria copiar otros datos internos (pero el nuevo objeto debe ser independiente)

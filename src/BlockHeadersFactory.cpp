@@ -24,7 +24,7 @@ BlockHeaders *BlockHeadersFactory::load(fstream *reader){
 			headers->load(reader);
 		break;
 		default :
-			cerr<<"BlockHeadersFactory::load - Tipo desconocido ("<<(unsigned int)type<<")\n";
+			cerr<<"BlockHeadersFactory::load - Tipo desconocido ("<<(unsigned long long)type<<")\n";
 		break;
 	}
 	return headers;
@@ -56,7 +56,7 @@ BlockHeaders *BlockHeadersFactory::load(BytesReader *reader){
 			headers->load(reader);
 		break;
 		default :
-			cerr<<"BlockHeadersFactory::load - Tipo desconocido ("<<(unsigned int)type<<")\n";
+			cerr<<"BlockHeadersFactory::load - Tipo desconocido ("<<(unsigned long long)type<<")\n";
 		break;
 	}
 	return headers;
@@ -86,7 +86,7 @@ void BlockHeadersFactory::save(BlockHeaders *headers, fstream *writer){
 }
 
 // Retorna el numero de bytes de type
-unsigned int BlockHeadersFactory::typeSize(){
+unsigned long long BlockHeadersFactory::typeSize(){
 	return 1;
 }
 

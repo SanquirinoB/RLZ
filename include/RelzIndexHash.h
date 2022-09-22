@@ -32,8 +32,8 @@ class RelzIndexHash {
 
 private: 
 	
-	unsigned int len_text;
-	unsigned int n_factors;
+	unsigned long long len_text;
+	unsigned long long n_factors;
 	
 	CompactedText *ref_text;
 	
@@ -59,23 +59,23 @@ private:
 	
 	// Prueba de aceleracion de recursive_rmq almacenando los datos de los factores descomprimidos
 	static const bool precompute_rmq = false;
-	vector<unsigned int> arr_tu;
-	vector<unsigned int> arr_pu;
-	vector<unsigned int> arr_lu;
+	vector<unsigned long long> arr_tu;
+	vector<unsigned long long> arr_pu;
+	vector<unsigned long long> arr_lu;
 	
 	// Simplifacion del calculo de posicion de inicio de factor en coleccion 
-	vector<unsigned int> factors_start;
+	vector<unsigned long long> factors_start;
 	
-	void recursive_rmq(unsigned int ini, unsigned int fin, unsigned int min_pos, unsigned int occ_ref, vector<unsigned int> &results);
+	void recursive_rmq(unsigned long long ini, unsigned long long fin, unsigned long long min_pos, unsigned long long occ_ref, vector<unsigned long long> &results);
 	
 public: 
 	RelzIndexHash();
 	RelzIndexHash(KarpRabin *_karp_rabin);
-	RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors, char *full_text, unsigned int _len_text, const char *_ref_text, unsigned int _len_ref, KarpRabin *_karp_rabin);
+	RelzIndexHash(vector<pair<unsigned long long, unsigned long long> > &factors, char *full_text, unsigned long long _len_text, const char *_ref_text, unsigned long long _len_ref, KarpRabin *_karp_rabin);
 	~RelzIndexHash();
 	
-	// void find(const string &pattern, vector<unsigned int> &results);
-	void findTimes(const string &pattern, vector<unsigned int> &results, bool use_hash = true);
+	// void find(const string &pattern, vector<unsigned long long> &results);
+	void findTimes(const string &pattern, vector<unsigned long long> &results, bool use_hash = true);
 	
 	unsigned long long querytime_p1;
 	unsigned long long querytime_p2;
@@ -83,10 +83,10 @@ public:
 	unsigned long long querytime_p3y;
 	unsigned long long querytime_p4;
 	
-	unsigned int occs_a;
-	unsigned int occs_b;
-	unsigned int occs_c;
-	unsigned int occs_d;
+	unsigned long long occs_a;
+	unsigned long long occs_b;
+	unsigned long long occs_c;
+	unsigned long long occs_d;
 	
 	KarpRabinFactorsSuffixes *getKRFactors(){
 		return kr_factors;

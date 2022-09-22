@@ -25,13 +25,13 @@ class ReferenceIndexRR : public ReferenceIndex{
 
 private:
 	//Largo (producto de strlen) del string referencia
-	unsigned int largo;
+	unsigned long long largo;
 	//String referencia. Podria contener largo ceros adicionales (para simplificar operaciones)
 	unsigned char *ref;
 	//Largo del arreglo (<= largo)
-	unsigned int largo_arr;
+	unsigned long long largo_arr;
 	//Arreglo de sufijos explicito
-	unsigned int *arr;
+	unsigned long long *arr;
 	
 public: 
 	
@@ -39,7 +39,7 @@ public:
 	
 	//Notar que esta version recibe una referencia completa serializada (ya construida)
 	//Escoge 1 de cada "distancia" enteros del arreglo (pero el texto completo)
-	ReferenceIndexRR(const char *ref_file, unsigned int distancia);
+	ReferenceIndexRR(const char *ref_file, unsigned long long distancia);
 	
 	//Esta version recibe un archivo especial para la RR que guarda el texto compacto
 	//Tampoco requiere distancia, esta version ya esta pasada por muestreo
@@ -49,7 +49,7 @@ public:
 	
 	//Busca el "text" en el arreglo de sufijos
 	//Guarda la posicio y el largo del mayor prefijo comun
-	virtual void find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const;
+	virtual void find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const;
 	
 	//Metodos de save para carga sin construccion
 	virtual void save(const char *ref_file);

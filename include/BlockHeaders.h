@@ -27,7 +27,7 @@ public:
 		virtual ~Header(){}
 		
 		// Retorna el tamaño en bytes de este header
-		virtual unsigned int size(){
+		virtual unsigned long long size(){
 			return 0;
 		}
 		
@@ -43,15 +43,15 @@ public:
 protected: 
 	
 	// Variables globales
-	unsigned int block_size;
+	unsigned long long block_size;
 	unsigned long long text_size;
-	unsigned int data_pos;
+	unsigned long long data_pos;
 	
 	// Byte para iniciar la escritura
 	// 0 inicialmente, o el primer header desacumulado en unprepare
-	unsigned int bytes_total_initial;
+	unsigned long long bytes_total_initial;
 	// Bloque inicial de la des-acumulacion
-	unsigned int unprepared_block;
+	unsigned long long unprepared_block;
 	
 	//Para que addBlock sea valido (y polimorfico), DEBE mantenerse una coleccion de punteros
 	//Los punteros tienen que ser guardados para mantener la memoria de cada header correctamente
@@ -66,7 +66,7 @@ public:
 	BlockHeaders();
 	
 	// Notar que BlockHeaders toma posesion de _lowcase_runs y lo borrara en su destructor
-	BlockHeaders(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata);
+	BlockHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata);
 	
 	virtual ~BlockHeaders();
 	
@@ -77,15 +77,15 @@ public:
 	// Carga un los datos de un header del fstream
 	// Para ello crea un nuevo header del tipo correcto, lo carga con load
 	// Luego agrega los datos de ese header a este objeto
-	virtual void loadBlock(fstream *reader, unsigned int bytes);
+	virtual void loadBlock(fstream *reader, unsigned long long bytes);
 	
 	// Similar al anterior, pero reemplaza el bloque de pos si existe (si no, lo agrega)
-	virtual void reloadBlock(fstream *reader, unsigned int bytes, unsigned int pos);
+	virtual void reloadBlock(fstream *reader, unsigned long long bytes, unsigned long long pos);
 	
 	// Guarda los datos de este BlockHeaders en un fstream
 	// Esto incluye todos los datos propios incluyendo metadatos
 	// Sin embargo NO almacena el tipo de headers (eso deberia hacerlo el factory)
-	virtual unsigned int save(fstream *writer);
+	virtual unsigned long long save(fstream *writer);
 	
 	// Carga todos los datos guardados por un save
 	virtual void load(fstream *reader);
@@ -94,21 +94,21 @@ public:
 	virtual void load(BytesReader *reader);
 	
 	// Retorna el tamaño de bloque
-	virtual unsigned int getBlockSize();
+	virtual unsigned long long getBlockSize();
 	
 	// Retorna el tamaño del texto (visto por un lector)
 	virtual unsigned long long getTextSize();
 	
 	// Retorna la posicion de inicio absoluta de los datos
-	virtual unsigned int getDataPosition();
+	virtual unsigned long long getDataPosition();
 	
 	// Retorna la posicion absoluta de inicio de un bloque en el archivo terminado
 	// Esto se usa en el write, para saber los bytes que deben preservarse
 	// Notar que el inicio de un bloque se usa tambien para el final del anterior
-	virtual unsigned int getBlockPosition(unsigned int block);
+	virtual unsigned long long getBlockPosition(unsigned long long block);
 	
 	// Retorna el numero (logico) de bloques
-	virtual unsigned int getNumBlocks();
+	virtual unsigned long long getNumBlocks();
 	
 	// Prepara headers recien cargados para un save (incluyendo calculo de data_pos)
 	// Acumula o ajusta las posiciones y agrega el bloque ficticio final (asume que dicho bloque no existe aun)
@@ -117,7 +117,7 @@ public:
 	// Deshace la preparacion desde un cierpo block_ini incluyendo la eliminacion del bloque ficticio
 	// Des-acumula los valores desde ese bloque en adelante
 	// ...guardando la posicion de ese bloque y su byte inicial para el proximo prepare
-	virtual void unprepare(unsigned int block_ini = 0);
+	virtual void unprepare(unsigned long long block_ini = 0);
 	
 	// Retorna metadata (real, no una copia) de este objeto
 	virtual Metadata *getMetadata();
@@ -128,10 +128,10 @@ public:
 	virtual void setMetadata(Metadata *_metadata);
 	
 	//LLamadas directas a los metodos de metadata
-	virtual void adjustCase(char *buff, unsigned long long ini, unsigned int length);
-	virtual unsigned int countNewLines(unsigned long long pos);
-	virtual void adjustNewLines(char *buff, unsigned long long ini, unsigned int length, unsigned int nl_izq, unsigned int nl_med, char *copy_buff = NULL);
-	virtual void filterNewText(const char *in_buff, unsigned int length, unsigned long long pos_ini, char *out_buff, unsigned int &adjusted_length, unsigned long long &adjusted_pos_ini);
+	virtual void adjustCase(char *buff, unsigned long long ini, unsigned long long length);
+	virtual unsigned long long countNewLines(unsigned long long pos);
+	virtual void adjustNewLines(char *buff, unsigned long long ini, unsigned long long length, unsigned long long nl_izq, unsigned long long nl_med, char *copy_buff = NULL);
+	virtual void filterNewText(const char *in_buff, unsigned long long length, unsigned long long pos_ini, char *out_buff, unsigned long long &adjusted_length, unsigned long long &adjusted_pos_ini);
 	
 	// Este metodo especial es para el write (ajusta el text_size interno solo si es necesario)
 	virtual void increaseTextSize(unsigned long long _text_size){

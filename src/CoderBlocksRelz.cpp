@@ -10,11 +10,11 @@ CoderBlocksRelz::CoderBlocksRelz(const ReferenceIndex *_referencia){
 CoderBlocksRelz::~CoderBlocksRelz(){
 }
 
-unsigned int CoderBlocksRelz::codingBufferSize(unsigned int block_size){
+unsigned long long CoderBlocksRelz::codingBufferSize(unsigned long long block_size){
 	return 2 * (block_size + 1) * sizeof(int);
 }
 
-void CoderBlocksRelz::codeBlock(const char *text, unsigned int text_size, fstream *file_headers, fstream *file_data, unsigned int &bytes_headers, unsigned int &bytes_data, char *full_buffer, vector<pair<unsigned int, unsigned int> > *external_factors){
+void CoderBlocksRelz::codeBlock(const char *text, unsigned long long text_size, fstream *file_headers, fstream *file_data, unsigned long long &bytes_headers, unsigned long long &bytes_data, char *full_buffer, vector<pair<unsigned long long, unsigned long long> > *external_factors){
 	
 	if( file_headers == NULL || file_data == NULL ){
 		cout << "CoderBlocksRelz::codeBlock - Omiting Files\n";
@@ -30,14 +30,14 @@ void CoderBlocksRelz::codeBlock(const char *text, unsigned int text_size, fstrea
 	bytes_data = 0;
 	
 	//Buffers locales (a partes del buffer entregado)
-	unsigned int *buff_pos = (unsigned int *)full_buffer;
-	unsigned int *buff_len = (buff_pos + text_size + 1);
+	unsigned long long *buff_pos = (unsigned long long *)full_buffer;
+	unsigned long long *buff_len = (buff_pos + text_size + 1);
 	//Variables para la compresion
-	unsigned int compressed_text = 0;
-	unsigned int pos_prefijo = 0;
-	unsigned int largo_prefijo = 0;
-	unsigned int n_factores = 0;
-	unsigned int max_pos = 0;
+	unsigned long long compressed_text = 0;
+	unsigned long long pos_prefijo = 0;
+	unsigned long long largo_prefijo = 0;
+	unsigned long long n_factores = 0;
+	unsigned long long max_pos = 0;
 	
 //	cout<<"CoderBlocksRelz::codeBlock - Text: \""<<string(text, (text_size>10)?10:text_size)<<((text_size>10)?"...":"")<<"\"\n";
 	
@@ -65,7 +65,7 @@ void CoderBlocksRelz::codeBlock(const char *text, unsigned int text_size, fstrea
     	//cout<<"factor\t"<<n_factores<<"\t"<<pos_prefijo<<"\t"<<largo_prefijo<<"\n";
 		
 		if( external_factors != NULL ){
-			external_factors->push_back( pair<unsigned int, unsigned int>(pos_prefijo, largo_prefijo) );
+			external_factors->push_back( pair<unsigned long long, unsigned long long>(pos_prefijo, largo_prefijo) );
 		}
 		
 //		cout<<"("<<pos_prefijo<<", "<<largo_prefijo<<")\n";
@@ -78,8 +78,8 @@ void CoderBlocksRelz::codeBlock(const char *text, unsigned int text_size, fstrea
 	if( file_headers != NULL && file_headers->good() && file_data != NULL && file_data->good() ){
 //		cout<<"CoderBlocksRelz::codeBlock - Escribiendo datos\n";
 		//Escribir datos
-		unsigned int bytes_pos = inner_pos_coder.encodeBlockMaxBits(buff_pos, n_factores, inner_utils.n_bits(max_pos), file_data);
-		unsigned int bytes_len = inner_len_coder.encodeBlockGolomb(buff_len, n_factores, file_data);
+		unsigned long long bytes_pos = inner_pos_coder.encodeBlockMaxBits(buff_pos, n_factores, inner_utils.n_bits(max_pos), file_data);
+		unsigned long long bytes_len = inner_len_coder.encodeBlockGolomb(buff_len, n_factores, file_data);
 		bytes_data = bytes_pos + bytes_len;
 //		cout<<"CoderBlocksRelz::codeBlock - Escribiendo header\n";
 		//Escribir header

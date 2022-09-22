@@ -4,7 +4,7 @@ ReferenceIndex::ReferenceIndex(){}
 
 ReferenceIndex::~ReferenceIndex(){}
 
-void ReferenceIndex::find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const{
+void ReferenceIndex::find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const{
 	position = 0;
 	length = 0;
 }
@@ -19,7 +19,7 @@ char *ReferenceIndex::loadText(const char *ref_file){
 	return NULL;
 }
 
-unsigned int ReferenceIndex::getLength(){
+unsigned long long ReferenceIndex::getLength(){
 	return 0;
 }
 
@@ -27,5 +27,5 @@ const char *ReferenceIndex::getText() const{
 	return NULL;
 }
 
-void ReferenceIndex::search(const char *text, unsigned int size, vector<unsigned int> &res) const{
+void ReferenceIndex::search(const char *text, unsigned long long size, vector<unsigned long long> &res) const{
 }

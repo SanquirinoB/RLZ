@@ -14,7 +14,7 @@ RelzIndexHash::RelzIndexHash(KarpRabin *_karp_rabin){
 	ref_text = NULL;
 }
 
-RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors, char *full_text, unsigned int _len_text, const char *_ref_text, unsigned int _len_ref, KarpRabin *_karp_rabin){
+RelzIndexHash::RelzIndexHash(vector<pair<unsigned long long, unsigned long long> > &factors, char *full_text, unsigned long long _len_text, const char *_ref_text, unsigned long long _len_ref, KarpRabin *_karp_rabin){
 	
 	len_text = _len_text;
 	n_factors = factors.size();
@@ -28,15 +28,15 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	cout << "RelzIndexHash - Preparing Factors\n";
 	// Factores en version ini, fin (absoluto) y ordenados por ini
-	vector<pair<unsigned int, pair<unsigned int, unsigned int> > > factors_sort;
-//	vector<unsigned int> factors_start;
-	unsigned int cur_start = 0;
-	unsigned int cur_pos = 0;
-	for( pair<unsigned int, unsigned int> factor : factors ){
+	vector<pair<unsigned long long, pair<unsigned long long, unsigned long long> > > factors_sort;
+//	vector<unsigned long long> factors_start;
+	unsigned long long cur_start = 0;
+	unsigned long long cur_pos = 0;
+	for( pair<unsigned long long, unsigned long long> factor : factors ){
 //		cout << "(" << factor.first << ", " << factor.second << ", " << cur_pos << ") - cur_start: " << cur_start << "\n";
 		factors_sort.push_back( 
-			pair<unsigned int, pair<unsigned int, unsigned int> >(
-				factor.first, pair<unsigned int, unsigned int>(factor.first + factor.second - 1, cur_pos++)
+			pair<unsigned long long, pair<unsigned long long, unsigned long long> >(
+				factor.first, pair<unsigned long long, unsigned long long>(factor.first + factor.second - 1, cur_pos++)
 				)
 			);
 		factors_start.push_back(cur_start);
@@ -46,7 +46,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	cout << "RelzIndexHash - Factors Sorted prepared in " << timer.getMilisec() << "\n";
 	timer.reset();
 //	cout << "Factors Sorted: \n";
-//	for( unsigned int i = 0; i < factors_sort.size(); ++i ){
+//	for( unsigned long long i = 0; i < factors_sort.size(); ++i ){
 //		cout << "factors_sort[" << i << "]: (" << factors_sort[i].first << ", " << factors_sort[i].second.first << ", " << factors_sort[i].second.second << ")\n";
 //	}
 	
@@ -55,8 +55,8 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	bit_vector arr_s(ref_text->length() + n_factors, 0);
 	unsigned cur_ref = 0;
 	cur_pos = 0;
-	for( unsigned int i = 0; i < n_factors; ++i ){
-		unsigned int ini = factors_sort[i].first;
+	for( unsigned long long i = 0; i < n_factors; ++i ){
+		unsigned long long ini = factors_sort[i].first;
 		if( ini == cur_ref ){
 			arr_s[cur_pos++] = 1;
 		}
@@ -77,7 +77,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	cout << "RelzIndexHash - Preparing Permutation PI\n";
 	pi = int_vector<>(n_factors);
 	pi_inv = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		pi[i] = factors_sort[i].second.second;
 		pi_inv[ factors_sort[i].second.second ] = i;
 	}
@@ -87,7 +87,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	// Posiciones finales Ez
 	int_vector<> ez(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		ez[i] = factors_sort[i].second.first;
 	}
 	rmq = rmq_type(&ez);
@@ -95,9 +95,9 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	// Bit vector B (inicio de las frases en texto)
 	cout << "RelzIndexHash - Preparing Vector B\n";
 	bit_vector arr_b(len_text, 0);
-	unsigned int pos_text = 0;
-	for( unsigned int i = 0; i < n_factors; ++i ){
-		unsigned int len = factors[i].second;
+	unsigned long long pos_text = 0;
+	for( unsigned long long i = 0; i < n_factors; ++i ){
+		unsigned long long len = factors[i].second;
 		arr_b[ pos_text ] = 1;
 		pos_text += len;
 	}
@@ -117,30 +117,30 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	// Preparacion de permutaciones X e Y
 	cout << "RelzIndexHash - Preparing arr X\n";
-	vector<unsigned int> arr_x_original(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	vector<unsigned long long> arr_x_original(n_factors);
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x_original[i] = i;
 	}
 	FactorsFastIteratorReverseComparator comp_rev(&factors_start, full_text, len_text);
 	stable_sort(arr_x_original.begin(), arr_x_original.end(), comp_rev);
 	arr_x = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x[i] = arr_x_original[i];
 	}
 	
-//	for( unsigned int i = 0; i < n_factors; ++i ){
+//	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_x[" << i << "]: " << arr_x[i] << " -> ";
 //		char c = 0;
 //		FactorsIteratorReverse it(arr_x[i] - 1, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, _ref_text, &fm_index, len_text);
-//		for(unsigned int k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
+//		for(unsigned long long k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
 //			cout << c;
 //		cout << "\n";
 //	}
 //	cout << "-----\n";
 	
 	cout << "RelzIndexHash - Preparing arr Y\n";
-	vector<unsigned int> arr_y_original(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	vector<unsigned long long> arr_y_original(n_factors);
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_y_original[i] = i;
 	}
 	
@@ -149,16 +149,16 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	arr_y = int_vector<>(n_factors);
 	int_vector<> arr_y_inv(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_y[i] = arr_y_original[i];
 		arr_y_inv[ arr_y_original[i] ] = i;
 	}
 	
-//	for( unsigned int i = 0; i < n_factors; ++i ){
+//	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_y[" << i << "]: " << arr_y[i] << " -> ";
 //		char c = 0;
 //		FactorsIterator it(arr_y[i], n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, _ref_text, &fm_index, len_text);
-//		for(unsigned int k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
+//		for(unsigned long long k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
 //			cout << c;
 //		cout << " (" << it.length() << ")\n";
 //	}
@@ -169,7 +169,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	cout << "RelzIndexHash - Preparing WT\n";
 	int_vector<> values_wt(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		values_wt[i] = arr_y_inv[ arr_x[ i ] ];
 	}
 	
@@ -179,10 +179,10 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	
 	// Prueba de aceleracion de recursive_rmq almacenando los datos de los factores descomprimidos
 	if(precompute_rmq){
-		for( unsigned int i = 0; i < n_factors; ++i ){
-			unsigned int tu = select1_s(i + 1) - i;
-			unsigned int pu = select1_b(pi[i] + 1);
-			unsigned int lu = select1_b(pi[i] + 2) - pu;
+		for( unsigned long long i = 0; i < n_factors; ++i ){
+			unsigned long long tu = select1_s(i + 1) - i;
+			unsigned long long pu = select1_b(pi[i] + 1);
+			unsigned long long lu = select1_b(pi[i] + 2) - pu;
 			arr_tu.push_back(tu);
 			arr_pu.push_back(pu);
 			arr_lu.push_back(lu);
@@ -190,7 +190,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	}
 	
 	cout << "RelzIndexHash - Testing factors_start\n";
-	for(unsigned int i = 0; i < n_factors; ++i){
+	for(unsigned long long i = 0; i < n_factors; ++i){
 		if(i < 10 || i > n_factors-10 ){
 			cout << "factors_start[" << i << "]: " << factors_start[i] << " (" << select1_b(i+1) << ")\n";
 		}
@@ -206,13 +206,13 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	// Ademas necesito la firma de cada sufijo de factor quizas?
 	
 	BitsUtils bits_utils;
-	unsigned int log_n = bits_utils.n_bits(ref_text->length());
+	unsigned long long log_n = bits_utils.n_bits(ref_text->length());
 	cout << "RelzIndexHash - Adding hash for Reference prefixes\n";
 	cout << "log_n: " << log_n << " de " << ref_text->length() << "\n";
 	arr_kr_ref.push_back( karp_rabin->hash(ref_text, 0, log_n) );
-	unsigned int processed_text = log_n;
+	unsigned long long processed_text = log_n;
 	while( processed_text < ref_text->length() ){
-		unsigned int word_len = log_n;
+		unsigned long long word_len = log_n;
 		if( ref_text->length() - processed_text < word_len ){
 			word_len = ref_text->length() - processed_text;
 		}
@@ -229,8 +229,8 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	// Por eso agrego un 0 para la primera frase (prefijo nulo)
 	cout << "RelzIndexHash - Adding hash for Frases prefixes\n";
 	arr_kr_s.push_back(0);
-	for(unsigned int i = 1; i < factors_start.size(); ++i){
-		unsigned int word_len = factors_start[i] - factors_start[i-1];
+	for(unsigned long long i = 1; i < factors_start.size(); ++i){
+		unsigned long long word_len = factors_start[i] - factors_start[i-1];
 		unsigned long long kr1 = arr_kr_s.back();
 		unsigned long long kr2 = karp_rabin->hash(full_text + factors_start[i-1], word_len);
 		unsigned long long kr_total = karp_rabin->concat(kr1, kr2, word_len);
@@ -242,7 +242,7 @@ RelzIndexHash::RelzIndexHash(vector<pair<unsigned int, unsigned int> > &factors,
 	}
 	// Agrego tambien el hash de la coleccion completa como un factor ficticio con id = n_factors
 	// Podria necesitarlo despues para simplificar los calculos
-	unsigned int word_len = len_text - factors_start.back();
+	unsigned long long word_len = len_text - factors_start.back();
 	unsigned long long kr1 = arr_kr_s.back();
 	unsigned long long kr2 = karp_rabin->hash(full_text + factors_start.back(), word_len);
 	unsigned long long kr_total = karp_rabin->concat(kr1, kr2, word_len);
@@ -291,7 +291,7 @@ void RelzIndexHash::printSize(){
 	double total_bytes = 0;
 	
 	// texto descomprimido
-	unsigned int len_ref = ref_text->length();
+	unsigned long long len_ref = ref_text->length();
 	total_bytes += len_ref;
 	cout << "RelzIndexHash::printSize - Reference Text: " << (2.0*len_ref/len_text) << " bps\n";
 	
@@ -334,7 +334,7 @@ void RelzIndexHash::printSize(){
 	
 }
 
-void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &results, bool use_hash){
+void RelzIndexHash::findTimes(const string &pattern, vector<unsigned long long> &results, bool use_hash){
 	
 //	cout << "RelzIndexHash::findTimes - Start (\"" << pattern << "\")\n";
 	NanoTimer timer;
@@ -353,11 +353,11 @@ void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &resul
 	timer.reset();
 	
 	for( int_vector<64> locations : arr_locations ){
-		for( unsigned int i = 0; i < occs; ++i ){
-			unsigned int occ_i = locations[i];
+		for( unsigned long long i = 0; i < occs; ++i ){
+			unsigned long long occ_i = locations[i];
 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
-			unsigned int select = select0_s(occ_i + 1);
-			unsigned int pos_ez = select - 1 - occ_i;
+			unsigned long long select = select0_s(occ_i + 1);
+			unsigned long long pos_ez = select - 1 - occ_i;
 			// Now the recursive search in rmq (0 - pos_ez)
 			if( occ_i >= select ){
 				continue;
@@ -375,33 +375,33 @@ void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &resul
 	karp_rabin->hashPrefixesRev(pattern, kr_pat_rev_vector);
 	
 	string pattern_rev;
-	for(unsigned int i = 0; i < pattern.length(); ++i){
+	for(unsigned long long i = 0; i < pattern.length(); ++i){
 		pattern_rev += pattern[pattern.length() - 1 - i];
 	}
 //	cout << "-----  pattern: " << pattern << " -----\n";
 //	cout << "-----  pattern_rev: " << pattern_rev << " -----\n";
 	
-	for(unsigned int i = 1; i < pattern.length(); ++i){
+	for(unsigned long long i = 1; i < pattern.length(); ++i){
 		timer.reset();
 		
 //		cout << "-----  tree_x.getRange -----\n";
-//		pair<unsigned int, unsigned int> r1 = tree_x.getRange(kr_pat_rev_vector, i, pattern_rev);
-		pair<unsigned int, unsigned int> r1 = tree_x.getRangeRev(kr_pat_rev_vector, i, pattern_rev, use_hash);
+//		pair<unsigned long long, unsigned long long> r1 = tree_x.getRange(kr_pat_rev_vector, i, pattern_rev);
+		pair<unsigned long long, unsigned long long> r1 = tree_x.getRangeRev(kr_pat_rev_vector, i, pattern_rev, use_hash);
 		querytime_p3x += timer.getNanosec();
 		timer.reset();
 //		cout << "-----\n";
 		
-		if( r1.first == (unsigned int)(-1) || r1.second == (unsigned int)(-1) || r1.second < r1.first ){
+		if( r1.first == (unsigned long long)(-1) || r1.second == (unsigned long long)(-1) || r1.second < r1.first ){
 			continue;
 		}
 		
 //		cout << "-----  tree_y.getRange -----\n";
-		pair<unsigned int, unsigned int> r2 = tree_y.getRange(kr_pat_vector, i, pattern, use_hash);
+		pair<unsigned long long, unsigned long long> r2 = tree_y.getRange(kr_pat_vector, i, pattern, use_hash);
 		querytime_p3y += timer.getNanosec();
 		timer.reset();
 //		cout << "-----\n";
 		
-		if( r2.first == (unsigned int)(-1) || r2.second == (unsigned int)(-1) || r2.second < r2.first ){
+		if( r2.first == (unsigned long long)(-1) || r2.second == (unsigned long long)(-1) || r2.second < r2.first ){
 			continue;
 		}
 		
@@ -409,15 +409,15 @@ void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &resul
 		auto res = wt.range_search_2d(r1.first, r1.second, r2.first, r2.second);
 //		cout << "RelzIndexHash::findTimes - Adding " << res.second.size() << " points\n";
 		for (auto point : res.second){
-			unsigned int f = arr_y[point.second];
-			unsigned int pu = select1_b(f + 1);
+			unsigned long long f = arr_y[point.second];
+			unsigned long long pu = select1_b(f + 1);
 			
 			// Verificacion
 			bool omit = false;
 			
 			FactorsIteratorCompactedReverse it_x(f-1, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, ref_text, len_text);
 //			cout << "text_x: ";
-			for(unsigned int pos = 0; pos < i; ++pos){
+			for(unsigned long long pos = 0; pos < i; ++pos){
 				char c = it_x.next();
 //				cout << c << "|" << pattern[ i - 1 - pos ] << " ";
 				if( c != pattern[ i - 1 - pos ] ){
@@ -430,7 +430,7 @@ void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &resul
 			if( !omit ){
 				FactorsIteratorCompacted it_y(f, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, ref_text, len_text);
 //				cout << "text_y: ";
-				for(unsigned int pos = 0; pos < pattern.length()-i; ++pos){
+				for(unsigned long long pos = 0; pos < pattern.length()-i; ++pos){
 					char c = it_y.next();
 //					cout << c << "|" << pattern[ i + pos ] << " ";
 					if( c != pattern[ i + pos ] ){
@@ -458,16 +458,16 @@ void RelzIndexHash::findTimes(const string &pattern, vector<unsigned int> &resul
 	
 }
 
-void RelzIndexHash::recursive_rmq(unsigned int ini, unsigned int fin, unsigned int min_pos, unsigned int occ_ref, vector<unsigned int> &results){
+void RelzIndexHash::recursive_rmq(unsigned long long ini, unsigned long long fin, unsigned long long min_pos, unsigned long long occ_ref, vector<unsigned long long> &results){
 //	cout << "RelzIndexHash::recursive_rmq - " << ini << ", " << fin << "\n";
 	
-	unsigned int pos_max = rmq(ini, fin);
+	unsigned long long pos_max = rmq(ini, fin);
 	
 //	cout << "FactorsIndex::recursive_rmq - Computing factor\n";
 	assert(pos_max < n_factors);
-	unsigned int tu = 0;
-	unsigned int pu = 0;
-	unsigned int lu = 0;
+	unsigned long long tu = 0;
+	unsigned long long pu = 0;
+	unsigned long long lu = 0;
 	if( precompute_rmq ){
 		tu = arr_tu[pos_max];
 		pu = arr_pu[pos_max];
@@ -639,10 +639,10 @@ void RelzIndexHash::load(const string &file_base, KarpRabin *_karp_rabin){
 	load_from_file(wt, wt_file);
 	
 	if(precompute_rmq){
-		for( unsigned int i = 0; i < n_factors; ++i ){
-			unsigned int tu = select1_s(i + 1) - i;
-			unsigned int pu = select1_b(pi[i] + 1);
-			unsigned int lu = select1_b(pi[i] + 2) - pu;
+		for( unsigned long long i = 0; i < n_factors; ++i ){
+			unsigned long long tu = select1_s(i + 1) - i;
+			unsigned long long pu = select1_b(pi[i] + 1);
+			unsigned long long lu = select1_b(pi[i] + 2) - pu;
 			arr_tu.push_back(tu);
 			arr_pu.push_back(pu);
 			arr_lu.push_back(lu);

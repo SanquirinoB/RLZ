@@ -27,15 +27,15 @@ public:
 	BytesReader(const char *_bytes);
 	virtual ~BytesReader();
 	
-	void read(char *salida, unsigned int n_bytes);
+	void read(char *salida, unsigned long long n_bytes);
 	
-	void seekg(unsigned int pos, unsigned int offset);
+	void seekg(unsigned long long pos, unsigned long long offset);
 	
 	void close();
 	
 	bool good() const;
 	
-	static const unsigned int beg = 0;
+	static const unsigned long long beg = 0;
 	
 };
 

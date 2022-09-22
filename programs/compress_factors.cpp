@@ -42,8 +42,8 @@ int main(int argc, char* argv[]){
 	const char *reference_text = argv[1];
 	const char *sequence_text = argv[2];
 	const char *output = argv[3];
-	unsigned int block_size = atoi(argv[4]);
-	unsigned int n_threads = atoi(argv[5]);
+	unsigned long long block_size = atoi(argv[4]);
+	unsigned long long n_threads = atoi(argv[5]);
 	const char *serialized_reference = argv[6];
 	bool build_reference = (atoi(argv[7]) == 1);
 	bool use_metadata = (atoi(argv[8]) == 1);
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
 	if(build_reference){
 	
 		char *text = NULL;
-		unsigned int text_size = 0;
+		unsigned long long text_size = 0;
 		
 		fstream reader(reference_text, fstream::in);
 		if( ! reader.good() ){
@@ -71,12 +71,12 @@ int main(int argc, char* argv[]){
 			return 0;
 		}
 		reader.seekg (0, reader.end);
-		unsigned int text_len = reader.tellg();
+		unsigned long long text_len = reader.tellg();
 		reader.seekg (0, reader.beg);
 		reader.close();
 		
 //		//Agregacion de N's y del alfabeto valido completo
-		unsigned int ns_len = 1024;
+		unsigned long long ns_len = 1024;
 		vector<char> alphabet;
 		filter->getAlphabet( &alphabet );
 		
@@ -88,10 +88,10 @@ int main(int argc, char* argv[]){
 		// TEMPORALMENTE COMENTADO MIENTRAS PRUEBO LA BUSQUEDA
 		
 		//Agregacion de N's y del alfabeto valido completo
-		for(unsigned int i = 0; i < ns_len; ++i){
+		for(unsigned long long i = 0; i < ns_len; ++i){
 			text[text_size++] = 'N';
 		}
-		for(unsigned int i = 0; i < alphabet.size(); ++i){
+		for(unsigned long long i = 0; i < alphabet.size(); ++i){
 			text[text_size++] = alphabet[i];
 		}
 		

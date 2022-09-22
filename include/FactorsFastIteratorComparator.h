@@ -12,23 +12,23 @@
 
 using namespace std;
 
-class FactorsFastIteratorComparator : public std::binary_function<unsigned int, unsigned int, bool> {
+class FactorsFastIteratorComparator : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
-	vector<unsigned int> *factors_starts;
+	vector<unsigned long long> *factors_starts;
 	char *full_text;
-	unsigned int full_size;
+	unsigned long long full_size;
 
 public:
 	FactorsFastIteratorComparator();
 	
-	FactorsFastIteratorComparator(vector<unsigned int> *_factors_starts, char *_full_text, unsigned int _full_size);
+	FactorsFastIteratorComparator(vector<unsigned long long> *_factors_starts, char *_full_text, unsigned long long _full_size);
 	
-	inline bool operator()(const unsigned int a, const unsigned int b){
-		unsigned int start_a = factors_starts->at(a);
-		unsigned int start_b = factors_starts->at(b);
-		unsigned int len_a = full_size - start_a;
-		unsigned int len_b = full_size - start_b;
-		for(unsigned int i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
+		unsigned long long start_a = factors_starts->at(a);
+		unsigned long long start_b = factors_starts->at(b);
+		unsigned long long len_a = full_size - start_a;
+		unsigned long long len_b = full_size - start_b;
+		for(unsigned long long i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
 			if( full_text[ start_a + i ] < full_text[ start_b + i ] ){
 				return true;
 			}
@@ -40,18 +40,18 @@ public:
 	}
 };
 
-class FactorsFastIteratorReverseComparator : public std::binary_function<unsigned int, unsigned int, bool> {
+class FactorsFastIteratorReverseComparator : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
-	vector<unsigned int> *factors_starts;
+	vector<unsigned long long> *factors_starts;
 	char *full_text;
-	unsigned int full_size;
+	unsigned long long full_size;
 
 public:
 	FactorsFastIteratorReverseComparator();
 	
-	FactorsFastIteratorReverseComparator(vector<unsigned int> *_factors_starts, char *_full_text, unsigned int _full_size);
+	FactorsFastIteratorReverseComparator(vector<unsigned long long> *_factors_starts, char *_full_text, unsigned long long _full_size);
 	
-	inline bool operator()(const unsigned int a, const unsigned int b){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
 		if( a == 0 ){
 			return true;
 		}
@@ -59,11 +59,11 @@ public:
 			return false;
 		}
 /*		cout << "Comp " << a << ", " << b << "\n";*/
-		unsigned int start_a = factors_starts->at(a) - 1;
-		unsigned int start_b = factors_starts->at(b) - 1;
-		unsigned int len_a = factors_starts->at(a) - factors_starts->at(a-1);
-		unsigned int len_b = factors_starts->at(b) - factors_starts->at(b-1);
-		for(unsigned int i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
+		unsigned long long start_a = factors_starts->at(a) - 1;
+		unsigned long long start_b = factors_starts->at(b) - 1;
+		unsigned long long len_a = factors_starts->at(a) - factors_starts->at(a-1);
+		unsigned long long len_b = factors_starts->at(b) - factors_starts->at(b-1);
+		for(unsigned long long i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
 			if( full_text[ start_a - i ] < full_text[ start_b - i ] ){
 				return true;
 			}

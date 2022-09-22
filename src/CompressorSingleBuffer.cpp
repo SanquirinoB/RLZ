@@ -49,7 +49,7 @@ CompressorSingleBuffer::~CompressorSingleBuffer(){
 	}
 }
 
-void CompressorSingleBuffer::prepareBuffer(unsigned int new_size){
+void CompressorSingleBuffer::prepareBuffer(unsigned long long new_size){
 	if( new_size > buffer_size ){
 		if(buffer != NULL){
 			delete [] buffer;
@@ -65,7 +65,7 @@ void CompressorSingleBuffer::prepareBuffer(unsigned int new_size){
 	}
 }
 
-unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned int length, char *out_buff){
+unsigned long long CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned long long length, char *out_buff){
 	//Verificacion de seguridad
 	if( decoder == NULL || master_file == NULL || strlen(master_file) < 1 ){
 		cerr<<"CompressorSingleBuffer::read - Datos incorrectos ("<<(decoder == NULL)<<" || "<<(master_file == NULL)<<" || "<<(strlen(master_file) < 1)<<")\n";
@@ -99,8 +99,8 @@ unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned i
 	prepareBuffer(length + 1);
 	
 	//Ajuste a posiciones relativas
-	unsigned int nl_izq = 0;
-	unsigned int nl_med = 0;
+	unsigned long long nl_izq = 0;
+	unsigned long long nl_med = 0;
 	if( decoder->getHeaders() != NULL && adjust_text){
 		nl_izq = decoder->getHeaders()->countNewLines(pos_ini);
 		nl_med = decoder->getHeaders()->countNewLines(pos_ini + length);
@@ -125,8 +125,8 @@ unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned i
 		procesar = false;
 	}
 	
-	unsigned int block = (unsigned int)( pos_ini / decoder->getBlockSize() );
-	unsigned int block_fin = (unsigned int)( (pos_ini + length) / decoder->getBlockSize() );
+	unsigned long long block = (unsigned long long)( pos_ini / decoder->getBlockSize() );
+	unsigned long long block_fin = (unsigned long long)( (pos_ini + length) / decoder->getBlockSize() );
 	if(block_fin > decoder->getNumBlocks()-1){
 		block_fin = decoder->getNumBlocks()-1;
 	}
@@ -134,11 +134,11 @@ unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned i
 	if(debug) cout<<"CompressorSingleBuffer::read - Procesando bloques ["<<block<<", "<<block_fin<<"] de "<<decoder->getNumBlocks()<<" (buffer_size: "<<buffer_size<<")\n";
 	
 	//total de caracteres copiados
-	unsigned int copied_chars = 0;
+	unsigned long long copied_chars = 0;
 	//ini de copia en el bloque actual. Normalmente es 0, solo puede ser diferente en el primer bloque
-	unsigned int ini_copy = 0;
+	unsigned long long ini_copy = 0;
 	//chars a copiar del bloque actual (el tamaño real del bloque, excepto al final)
-	unsigned int copy_length = 0;
+	unsigned long long copy_length = 0;
 	//Posicion de inicio del bloque actual en el texto comprimido
 	unsigned long long cur_block_ini = 0;
 	
@@ -159,7 +159,7 @@ unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned i
 				cerr<<"CompressorSingleBuffer::read - Error, valor > 32 bits\n";
 				break;
 			}
-			ini_copy = (unsigned int)(pos_ini - cur_block_ini);
+			ini_copy = (unsigned long long)(pos_ini - cur_block_ini);
 		}
 		if(debug) cout<<"CompressorSingleBuffer::read - ini_copy: "<<ini_copy<<"\n";
 		
@@ -205,7 +205,7 @@ unsigned int CompressorSingleBuffer::read(unsigned long long pos_ini, unsigned i
 	return copied_chars;
 }
 
-bool CompressorSingleBuffer::decompress(const char *out_file, unsigned int line_size){
+bool CompressorSingleBuffer::decompress(const char *out_file, unsigned long long line_size){
 	cout<<"CompressorSingleBuffer::decompress - Inicio\n";
 	//Verificacion de seguridad
 	if( decoder == NULL || out_file == NULL || strlen(out_file) < 1 || master_file == NULL || strlen(master_file) < 1){
@@ -222,7 +222,7 @@ bool CompressorSingleBuffer::decompress(const char *out_file, unsigned int line_
 	}
 //	cout<<"CompressorSingleBuffer::decompress - Preparando buffer de linea\n";
 	char *line = new char[line_size + 1];
-	unsigned int real_size = 0;
+	unsigned long long real_size = 0;
 	unsigned long long ini = 0;
 	cout<<"CompressorSingleBuffer::decompress - Iniciando read por linea\n";
 	ini += read(ini, line_size, line);
@@ -249,7 +249,7 @@ bool CompressorSingleBuffer::decompress(const char *out_file, unsigned int line_
 	return true;
 }
 
-unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned int original_length, unsigned long long original_pos_ini){
+unsigned long long CompressorSingleBuffer::write(const char *original_text, unsigned long long original_length, unsigned long long original_pos_ini){
 
 	bool implementacion_terminada = true;
 	if(! implementacion_terminada){
@@ -288,7 +288,7 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 	prepareBuffer(decoder->getBlockSize() + 1);
 	
 	// Aqui habria que filtrar el texto de entrada para extraer metadatos
-	unsigned int length = original_length;
+	unsigned long long length = original_length;
 	unsigned long long pos_ini = original_pos_ini;
 	char *text = new char[length + 1];
 	text[0] = 0;
@@ -300,27 +300,27 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 	}
 	
 	//Notar que en este caso es valido un block_fin > ultimo bloque, debe verificarse en el ciclo
-	unsigned int block_ini = (unsigned int)( pos_ini / decoder->getBlockSize() );
-	unsigned int block_fin = (unsigned int)( (pos_ini + length) / decoder->getBlockSize() );
-	unsigned int block = block_ini;
+	unsigned long long block_ini = (unsigned long long)( pos_ini / decoder->getBlockSize() );
+	unsigned long long block_fin = (unsigned long long)( (pos_ini + length) / decoder->getBlockSize() );
+	unsigned long long block = block_ini;
 	
 	//total de caracteres copiados
-//	unsigned int copied_chars = 0;
+//	unsigned long long copied_chars = 0;
 	//ini de copia en el bloque actual. Normalmente es 0, solo puede ser diferente en el primer bloque
-	unsigned int ini_copy = 0;
+	unsigned long long ini_copy = 0;
 	//chars a copiar del bloque actual (el tamaño real del bloque, excepto al final)
-	unsigned int copy_length = 0;
+	unsigned long long copy_length = 0;
 	//Posicion de inicio del bloque actual en el texto comprimido
 	unsigned long long cur_block_ini = 0;
 	//Tamaño efectivo del bloque (block size salvo por el ultimo)
-	unsigned int real_size = 0;
+	unsigned long long real_size = 0;
 	
 	// Variables para la compresion y merge
-	vector<unsigned int> vector_bytes_headers;
-	vector<unsigned int> vector_bytes_data;
-	unsigned int bytes_headers = 0;
-	unsigned int bytes_data = 0;
-	unsigned int full_buffer_size = coder->codingBufferSize( decoder->getBlockSize() );
+	vector<unsigned long long> vector_bytes_headers;
+	vector<unsigned long long> vector_bytes_data;
+	unsigned long long bytes_headers = 0;
+	unsigned long long bytes_data = 0;
+	unsigned long long full_buffer_size = coder->codingBufferSize( decoder->getBlockSize() );
 	// Defino un minimo al buffer pues lo usare luego para las copias (read/write)
 	if( full_buffer_size < 1024*128 ){
 		full_buffer_size = 1024*128;
@@ -335,10 +335,10 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 //	headers->unprepare(block);
 	// Para la primera copia se necesita la pos de inicio y termino en bytes del rango de bloques
 	// Esto puede preguntarsele a headers con algun metodo especial que calcule el rango
-	unsigned int first_copy_start = headers->getDataPosition();
-	unsigned int first_copy_end = headers->getBlockPosition(block_fin);
-	unsigned int third_copy_start = 0;
-	unsigned int third_copy_end = 0;
+	unsigned long long first_copy_start = headers->getDataPosition();
+	unsigned long long first_copy_end = headers->getBlockPosition(block_fin);
+	unsigned long long third_copy_start = 0;
+	unsigned long long third_copy_end = 0;
 	if( block_fin < headers->getNumBlocks() ){
 		third_copy_start = headers->getBlockPosition(block_fin + 1);
 		// La llamada que sigue funciona, pero quizas sea mejor implementarla de forma mas clara
@@ -346,8 +346,8 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 	}
 	fstream file_headers(path_headers, fstream::trunc | fstream::binary | fstream::out);
 	fstream file_data(path_data, fstream::trunc | fstream::binary | fstream::out);
-	unsigned int total_bytes_data = 0;
-	unsigned int total_copied_chars = 0;
+	unsigned long long total_bytes_data = 0;
+	unsigned long long total_copied_chars = 0;
 	// Ajusto de inmediato el largo del texto
 	// Notar que esto PODRIA hacerse mejor con alguna verificacion posterior
 	headers->increaseTextSize(pos_ini + length);
@@ -368,7 +368,7 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 				cerr<<"CompressorSingleBuffer::write - Error, valor > 32 bits\n";
 				break;
 			}
-			ini_copy = (unsigned int)(pos_ini - cur_block_ini);
+			ini_copy = (unsigned long long)(pos_ini - cur_block_ini);
 		}
 		
 		copy_length = real_size;
@@ -449,8 +449,8 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 	// Primero copiar datos desde bloque [0, block_ini)
 	// Luego copiar datos del archivo nuevo (desde [block_ini, block_fin])
 	// Luego copiar (si hay) datos desde (block_fin, n_blocks] desde el original
-	unsigned int copied = 0;
-	unsigned int this_copy = 0;
+	unsigned long long copied = 0;
+	unsigned long long this_copy = 0;
 	
 	// Primera copia [0, block_ini) (excluyente, me basta con los margenes)
 	cout<<"CompressorSingleBuffer::write - Primera copia de data (copiar?: "<<(block_ini > 0)<<")\n";
@@ -459,7 +459,7 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 		// Esos datos los guardo en first_copy_start y first_copy_end
 		file_data.open(master_file, fstream::binary | fstream::in);
 		file_data.seekg(first_copy_start, file_data.beg);
-		unsigned int total = first_copy_end - first_copy_start;
+		unsigned long long total = first_copy_end - first_copy_start;
 		copied = 0;
 		this_copy = full_buffer_size;
 		while( copied < total ){
@@ -493,7 +493,7 @@ unsigned int CompressorSingleBuffer::write(const char *original_text, unsigned i
 	if( (third_copy_start > 0) && (third_copy_end > 0) ){
 		file_data.open(master_file, fstream::binary | fstream::in);
 		file_data.seekg(third_copy_start, file_data.beg);
-		unsigned int total = third_copy_end - third_copy_start;
+		unsigned long long total = third_copy_end - third_copy_start;
 		copied = 0;
 		this_copy = full_buffer_size;
 		while( copied < total ){

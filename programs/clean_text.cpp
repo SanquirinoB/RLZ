@@ -23,21 +23,21 @@ int main(int argc, char* argv[]){
 	
 //	cout << "Start";
 	
-	unsigned int max_read = 10000000;
+	unsigned long long max_read = 10000000;
 	char *buff = new char[max_read + 1];
 	char *buff_output = new char[max_read + 1];
 	memset(buff_output, 0, max_read);
 	
 	fstream reader(input, fstream::in);
-	unsigned int cur_pos = 0;
+	unsigned long long cur_pos = 0;
 	while( reader.good() ){
 		reader.read(buff, max_read);
-		unsigned int n_read = reader.gcount();
+		unsigned long long n_read = reader.gcount();
 		if( n_read < 1 ){
 			continue;
 		}
 		buff[n_read] = 0;
-		for(unsigned int i = 0; i < n_read; ++i){
+		for(unsigned long long i = 0; i < n_read; ++i){
 			char c = toupper(buff[i]);
 			if(c == 'A' || c == 'T' || c == 'C' || c == 'G'){
 //				buff_output[cur_pos++] = buff[i];

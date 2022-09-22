@@ -13,7 +13,7 @@ KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(){
 	pi_inv = NULL;
 }
 
-KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(unsigned int _n_factors, 
+KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(unsigned long long _n_factors, 
 		vector<unsigned long long> *_arr_kr_s, 
 		KarpRabin *_karp_rabin, 
 		const char *_ref_text, 
@@ -59,7 +59,7 @@ KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(const string &file,
 	pi_inv = _pi_inv;
 }
 
-KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(unsigned int _n_factors, 
+KarpRabinFactorsSuffixes::KarpRabinFactorsSuffixes(unsigned long long _n_factors, 
 		vector<unsigned long long> *_arr_kr_s, 
 		KarpRabin *_karp_rabin, 
 		CompactedText *_compacted_text, 
@@ -118,24 +118,24 @@ KarpRabinFactorsSuffixes::~KarpRabinFactorsSuffixes(){
 }
 
 // Fast version, only valid for offset and length < karp_rabin->getTableSize()
-unsigned long long KarpRabinFactorsSuffixes::hash(unsigned int factor_ini, unsigned int length){
+unsigned long long KarpRabinFactorsSuffixes::hash(unsigned long long factor_ini, unsigned long long length){
 //	cout << "KarpRabinFactorsSuffixes::hash - Start (factor_ini: " << factor_ini << ", length: " << length << ", n_factors: " << n_factors << ", n_pi_inv: " << pi_inv->size() << ")\n";
 	unsigned long long kr1 = 0;
 	
-	unsigned int cur_len = 0;
-	unsigned int factor_cur = 0;
-	unsigned int tu = 0;
+	unsigned long long cur_len = 0;
+	unsigned long long factor_cur = 0;
+	unsigned long long tu = 0;
 	
 	// Version con Busqueda Binaria
-	unsigned int l = factor_ini;
+	unsigned long long l = factor_ini;
 	// TODO : verificar n_factors - 1
-	unsigned int h = n_factors;
-	unsigned int factor_cur_bin = factor_ini;
-	unsigned int pu_ini = select1_b->operator()(factor_ini + 1);
+	unsigned long long h = n_factors;
+	unsigned long long factor_cur_bin = factor_ini;
+	unsigned long long pu_ini = select1_b->operator()(factor_ini + 1);
 	
-	unsigned int cur_perm_bin = (*pi_inv)[factor_cur_bin];
-	unsigned int tu_bin = select1_s->operator()(cur_perm_bin + 1) - cur_perm_bin;
-	unsigned int pu_bin = select1_b->operator()(factor_cur_bin + 1);
+	unsigned long long cur_perm_bin = (*pi_inv)[factor_cur_bin];
+	unsigned long long tu_bin = select1_s->operator()(cur_perm_bin + 1) - cur_perm_bin;
+	unsigned long long pu_bin = select1_b->operator()(factor_cur_bin + 1);
 	
 //	cout << "1\n";
 	while(l < h){
@@ -156,7 +156,7 @@ unsigned long long KarpRabinFactorsSuffixes::hash(unsigned int factor_ini, unsig
 		pu_bin = select1_b->operator()(factor_cur_bin + 1);
 	}
 //	cout << "3 (factor_cur_bin: " << factor_cur_bin << ")\n";
-	unsigned int cur_len_bin = (pu_bin - pu_ini);
+	unsigned long long cur_len_bin = (pu_bin - pu_ini);
 	cur_perm_bin = (*pi_inv)[factor_cur_bin];
 	tu_bin = select1_s->operator()(cur_perm_bin + 1) - cur_perm_bin;
 	
@@ -188,7 +188,7 @@ unsigned long long KarpRabinFactorsSuffixes::hash(unsigned int factor_ini, unsig
 }
 
 // Fast version, only valid for offset and length < karp_rabin->getTableSize()
-unsigned long long KarpRabinFactorsSuffixes::hash(unsigned int factor_ini, unsigned int offset, unsigned int length){
+unsigned long long KarpRabinFactorsSuffixes::hash(unsigned long long factor_ini, unsigned long long offset, unsigned long long length){
 //	cout << "KarpRabinFactorsSuffixes::hash - Start (factor_ini: " << factor_ini << ", offset: " << offset << ", length: " << length << ")\n";
 	
 	if( length == 0 ){
@@ -210,10 +210,10 @@ void KarpRabinFactorsSuffixes::save(const string &file){
 	
 	writer.write((char*)&n_factors, sizeof(int));
 	
-	unsigned int n_arr = arr_kr_s->size();
+	unsigned long long n_arr = arr_kr_s->size();
 	writer.write((char*)&n_arr, sizeof(int));
-	for(unsigned int i = 0; i < n_arr; ++i){
-		unsigned int kr = (unsigned int )(arr_kr_s->at(i));
+	for(unsigned long long i = 0; i < n_arr; ++i){
+		unsigned long long kr = (unsigned long long )(arr_kr_s->at(i));
 		writer.write((char*)&kr, sizeof(int));
 	}
 	
@@ -231,10 +231,10 @@ void KarpRabinFactorsSuffixes::load(const string &file){
 	delete_krs = true;
 	arr_kr_s = new vector<unsigned long long>();
 	
-	unsigned int n_arr = 0;
+	unsigned long long n_arr = 0;
 	reader.read((char*)&n_arr, sizeof(int));
-	for(unsigned int i = 0; i < n_arr; ++i){
-		unsigned int kr = 0;
+	for(unsigned long long i = 0; i < n_arr; ++i){
+		unsigned long long kr = 0;
 		reader.read((char*)&kr, sizeof(int));
 		arr_kr_s->push_back(kr);
 	}

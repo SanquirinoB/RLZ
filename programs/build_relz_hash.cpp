@@ -48,19 +48,19 @@ int main(int argc, char* argv[]){
 		new DecoderBlocksRelz(reference->getText()), 
 		filter
 	);
-	vector<pair<unsigned int, unsigned int> > factors;
+	vector<pair<unsigned long long, unsigned long long> > factors;
 	unsigned long long len_text = 0;
 	char *text = compressor.compressFactors(input, 1000000, len_text, &factors);
 	cout << "Full text loaded of " << len_text << " chars\n";
 	
 	const char *ref = reference->getText();
-	unsigned int len_ref = reference->getLength();
+	unsigned long long len_ref = reference->getLength();
 	
 	cout << "----- Building index -----\n";
 	NanoTimer timer;
-	unsigned int bits = 8;
-//	unsigned int mod = 787;
-	unsigned int mod = 15485863;
+	unsigned long long bits = 8;
+//	unsigned long long mod = 787;
+	unsigned long long mod = 15485863;
 //	KarpRabin karp_rabin(bits, mod, 1100000000);
 	KarpRabin karp_rabin(bits, mod, 100000000);
 	RelzIndexHash index(factors, text, len_text, ref, len_ref, &karp_rabin);

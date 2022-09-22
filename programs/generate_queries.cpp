@@ -22,12 +22,12 @@ int main(int argc, char* argv[]){
 	}
 	
 	const char *input = argv[1];
-	unsigned int n_queries = atoi(argv[2]);
-	unsigned int length = atoi(argv[3]);
+	unsigned long long n_queries = atoi(argv[2]);
+	unsigned long long length = atoi(argv[3]);
 	
 //	cout << "Start - Reading \"" << input << "\" to extract " << n_queries << " of length " << length << "\n";
 	
-	unsigned int max_read = 10000000;
+	unsigned long long max_read = 10000000;
 	char *buff = new char[max_read + 1];
 	char *buff_output = new char[length + 1];
 	
@@ -46,9 +46,9 @@ int main(int argc, char* argv[]){
 	unsigned long long text_size = 0;
 	while( total < file_size && reader.good() ){
 		reader.read(buff, max_read);
-		unsigned int n_read = reader.gcount();
+		unsigned long long n_read = reader.gcount();
 		total += n_read;
-		for(unsigned int i = 0; i < n_read; ++i){
+		for(unsigned long long i = 0; i < n_read; ++i){
 			char c = toupper(buff[i]);
 //			if(c == 'A' || c == 'T' || c == 'C' || c == 'G'){
 			if( (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ){
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 	mt19937 generator(seed());
 	uniform_int_distribution<unsigned long long> dist(0ULL, text_size - length - 1);
 	
-	for( unsigned int i = 0; i < n_queries; ++i ){
+	for( unsigned long long i = 0; i < n_queries; ++i ){
 		unsigned long long pos = dist(generator);
 		memcpy(buff_output, text + pos, length);
 		buff_output[length] = 0;

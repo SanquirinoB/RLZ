@@ -26,17 +26,18 @@
 using namespace sdsl;
 using namespace std;
 
+
 class RelzIndexReference {
 
 private: 
 	
-	unsigned int len_text;
+	unsigned long long len_text;
 	
 	CompactedText *ref_text;
 //	char *ref_text;
-//	unsigned int len_ref;
+//	unsigned long long len_ref;
 	
-	unsigned int n_factors;
+	unsigned long long n_factors;
 	
 	fm_index_type fm_index;
 	
@@ -60,24 +61,24 @@ private:
 	
 	// Prueba de aceleracion de recursive_rmq almacenando los datos de los factores descomprimidos
 	static const bool precompute_rmq = false;
-	vector<unsigned int> arr_tu;
-	vector<unsigned int> arr_pu;
-	vector<unsigned int> arr_lu;
+	vector<unsigned long long> arr_tu;
+	vector<unsigned long long> arr_pu;
+	vector<unsigned long long> arr_lu;
 	
-	void recursive_rmq(unsigned int ini, unsigned int fin, unsigned int min_pos, unsigned int occ_ref, vector<unsigned int> &results);
+	void recursive_rmq(unsigned long long ini, unsigned long long fin, unsigned long long min_pos, unsigned long long occ_ref, vector<unsigned long long> &results);
 			
-	pair<unsigned int, unsigned int> getRangeY(const char *pattern);
-	pair<unsigned int, unsigned int> getRangeX(const char *pattern);
+	pair<unsigned long long, unsigned long long> getRangeY(const char *pattern);
+	pair<unsigned long long, unsigned long long> getRangeX(const char *pattern);
 	
 	template <typename ItereatorType>
-	bool factorLess(unsigned int factor, const char *pattern, unsigned int len, bool equal = false);
+	bool factorLess(unsigned long long factor, const char *pattern, unsigned long long len, bool equal = false);
 	
 public: 
 	RelzIndexReference();
-	RelzIndexReference(vector<pair<unsigned int, unsigned int> > &factors, char *full_text, unsigned int _len_text, const char *_ref_text, unsigned int _len_ref);
+	RelzIndexReference(vector<pair<unsigned long long, unsigned long long> > &factors, char *full_text, unsigned long long _len_text, const char *_ref_text, unsigned long long _len_ref);
 	~RelzIndexReference();
 	
-	void findTimes(const string &pattern, vector<unsigned int> &results);
+	void findTimes(const string &pattern, vector<unsigned long long> &results);
 	
 	double getSize();
 	
@@ -90,9 +91,9 @@ public:
 	unsigned long long querytime_p3;
 	unsigned long long querytime_p4;
 	
-	unsigned int occs_a;
-	unsigned int occs_b;
-	unsigned int occs_c;
+	unsigned long long occs_a;
+	unsigned long long occs_b;
+	unsigned long long occs_c;
 	
 };
 

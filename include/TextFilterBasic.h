@@ -22,10 +22,10 @@ public:
 	
 	// Almacena el alfabeto valido completo en alphabet (si es NULL lo omite)
 	// Retorna el total de chars validos (incluso si alphabet == NULL)
-	virtual unsigned int getAlphabet(vector<char> *alphabet = NULL);
+	virtual unsigned long long getAlphabet(vector<char> *alphabet = NULL);
 	
 	// Con validChar y el TextFilter::readText basta, no es necesario redefinir en este caso
-//	virtual char *readText(const char *in_file, unsigned int &text_length, vector< pair<unsigned int, unsigned int> > *lowcase_runs = NULL);
+//	virtual char *readText(const char *in_file, unsigned long long &text_length, vector< pair<unsigned long long, unsigned long long> > *lowcase_runs = NULL);
 	
 };
 

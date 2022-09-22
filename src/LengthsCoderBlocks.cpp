@@ -26,25 +26,25 @@ void LengthsCoderBlocks::deleteBuffer(){
 	}
 }
 
-void LengthsCoderBlocks::prepareBuffer(unsigned int new_size){
+void LengthsCoderBlocks::prepareBuffer(unsigned long long new_size){
 	if( new_size > buff_size ){
 		deleteBuffer();
 		buff_size = new_size;
-		buff = new unsigned int[buff_size];
+		buff = new unsigned long long[buff_size];
 	}
 }
 
-void LengthsCoderBlocks::setGolombBase(unsigned int potencia_base){
+void LengthsCoderBlocks::setGolombBase(unsigned long long potencia_base){
 	utils.setGolombBase(potencia_base);
 }
 
-unsigned int LengthsCoderBlocks::encodeBlockGolomb(unsigned int *arr_len, unsigned int n_factores, fstream *escritor){
+unsigned long long LengthsCoderBlocks::encodeBlockGolomb(unsigned long long *arr_len, unsigned long long n_factores, fstream *escritor){
 	
 //	cout<<"LengthsCoderBlocks::encodeBlockGolomb - Inicio ("<<n_factores<<" largos)\n";
 	//En esta version primero calculare el numero real de bits
 	//Con eso, determino el numero de bytes real a ser usado
 	unsigned long long total_bits = 0;
-	for(unsigned int i = 0; i < n_factores; ++i){
+	for(unsigned long long i = 0; i < n_factores; ++i){
 		total_bits += utils.bits_golomb(arr_len[i]);
 	}
 	//cambio a ints
@@ -54,15 +54,15 @@ unsigned int LengthsCoderBlocks::encodeBlockGolomb(unsigned int *arr_len, unsign
 	prepareBuffer(total_bits);
 //	memset(buff, 0, total_bits * sizeof(int));
 	memset(buff, 0, (total_bits << 2));
-	unsigned int pos_buff = 0;
-	for(unsigned int i = 0; i < n_factores; ++i){
+	unsigned long long pos_buff = 0;
+	for(unsigned long long i = 0; i < n_factores; ++i){
 		pos_buff += utils.write_golomb(buff, pos_buff, arr_len[i]);
 	}
-//	unsigned int n_escribir = pos_buff / 32;
+//	unsigned long long n_escribir = pos_buff / 32;
 //	if(n_escribir * 32 < pos_buff){
 //		++n_escribir;
 //	}
-	unsigned int n_escribir = (pos_buff >> 5);
+	unsigned long long n_escribir = (pos_buff >> 5);
 	if( (n_escribir << 5) < pos_buff ){
 		++n_escribir;
 	}
@@ -73,7 +73,7 @@ unsigned int LengthsCoderBlocks::encodeBlockGolomb(unsigned int *arr_len, unsign
 }
 
 //Metodo de Lectura
-void LengthsCoderBlocks::open(const char *_nombre_archivo, unsigned int _byte_ini){
+void LengthsCoderBlocks::open(const char *_nombre_archivo, unsigned long long _byte_ini){
 	cout<<"LengthsCoderBlocks::open - inicio (\""<<_nombre_archivo<<"\" desde byte "<<_byte_ini<<")\n";
 	//En lugar de hacer un open explicito (que mantenga abierto el stream) solo lo trato de ese modo
 	//Por seguridad, abro el archivo solo al leerlo (quizas pueda recibirse un stream abierto por el llamador)
@@ -81,9 +81,9 @@ void LengthsCoderBlocks::open(const char *_nombre_archivo, unsigned int _byte_in
 	byte_ini = _byte_ini;
 }
 
-void LengthsCoderBlocks::decodeBlockGolomb(unsigned int byte_start, unsigned int n_bytes, unsigned int n_factores, unsigned int *arr_len){
+void LengthsCoderBlocks::decodeBlockGolomb(unsigned long long byte_start, unsigned long long n_bytes, unsigned long long n_factores, unsigned long long *arr_len){
 //	cout<<"LengthsCoderBlocks::decodeBlockGolomb - Inicio (inicio: "<<byte_start<<", bytes: "<<n_bytes<<", n_factores: "<<n_factores<<")\n";
-	unsigned int max_ints = 1 + (n_bytes >> 2);
+	unsigned long long max_ints = 1 + (n_bytes >> 2);
 	prepareBuffer(max_ints);
 //	prepareBuffer(n_factores + 1);
 	memset(buff, 0, max_ints * sizeof(int));
@@ -95,8 +95,8 @@ void LengthsCoderBlocks::decodeBlockGolomb(unsigned int byte_start, unsigned int
 	archivo.seekg(byte_start + byte_ini, archivo.beg);
 	archivo.read((char*)buff, n_bytes);
 	archivo.close();
-	unsigned int pos_buff = 0;
-	for(unsigned int i = 0; i < n_factores; ++i){
+	unsigned long long pos_buff = 0;
+	for(unsigned long long i = 0; i < n_factores; ++i){
 		pos_buff += utils.read_golomb(buff, pos_buff, arr_len[i]);
 	}
 //	cout<<"LengthsCoderBlocks::decodeBlockGolomb - Fin\n";

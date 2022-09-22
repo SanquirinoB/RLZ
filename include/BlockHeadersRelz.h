@@ -13,21 +13,21 @@ class BlockHeadersRelz : public BlockHeaders {
 public:
 	class HeaderRelz : public BlockHeaders::Header{
 	public:
-		unsigned int n_factores;
-		unsigned int bytes_pos;
-		unsigned int bytes_len;
+		unsigned long long n_factores;
+		unsigned long long bytes_pos;
+		unsigned long long bytes_len;
 		HeaderRelz(){
 			n_factores = 0;
 			bytes_pos = 0;
 			bytes_len = 0;
 		}
 		virtual ~HeaderRelz(){}
-		HeaderRelz(unsigned int _n_factores, unsigned int _bytes_pos, unsigned int _bytes_len){
+		HeaderRelz(unsigned long long _n_factores, unsigned long long _bytes_pos, unsigned long long _bytes_len){
 			n_factores = _n_factores;
 			bytes_pos = _bytes_pos;
 			bytes_len = _bytes_len;
 		}
-		virtual unsigned int size(){
+		virtual unsigned long long size(){
 			return 3 * sizeof(int);
 		}
 		virtual void save(fstream *file){
@@ -52,10 +52,10 @@ public:
 private: 
 	
 //	//Variables globales
-//	unsigned int block_size;
+//	unsigned long long block_size;
 //	unsigned long long text_size;
-//	unsigned int bytes_total_initial
-//	unsigned int unprepared_block;
+//	unsigned long long bytes_total_initial
+//	unsigned long long unprepared_block;
 	
 	//Uso un vector de HeaderRelz* para usar cast SOLO en el add
 	//vector<Header*> headers;
@@ -68,7 +68,7 @@ public:
 
 	BlockHeadersRelz();
 
-	BlockHeadersRelz(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata);
+	BlockHeadersRelz(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata);
 	
 	virtual ~BlockHeadersRelz();
 	
@@ -79,15 +79,15 @@ public:
 	//Carga un los datos de un header del fstream
 	//Para ello crea un nuevo header del tipo correcto, lo carga con load
 	//Luego agrega los datos de ese header a este objeto
-	virtual void loadBlock(fstream *reader, unsigned int bytes);
+	virtual void loadBlock(fstream *reader, unsigned long long bytes);
 	
 	//Similar al anterior, pero reemplaza el bloque de pos si existe (si no, lo agrega)
-	virtual void reloadBlock(fstream *reader, unsigned int bytes, unsigned int pos);
+	virtual void reloadBlock(fstream *reader, unsigned long long bytes, unsigned long long pos);
 	
 	//Guarda los datos de este BlockHeaders en un fstream
 	//Esto incluye todos los datos propios incluyendo metadatos
 	//Sin embargo NO almacena el tipo de headers (eso deberia hacerlo el factory)
-	virtual unsigned int save(fstream *writer);
+	virtual unsigned long long save(fstream *writer);
 	
 	//Carga todos los datos guardados por un save
 	virtual void load(fstream *reader);
@@ -97,10 +97,10 @@ public:
 	
 	//Version de lectura usada previamente en el Recoder
 	//Queda en espera mientras no se reconstruya ese objeto	
-//	void loadBytes(char *bytes, unsigned int byte_ini = 0);
+//	void loadBytes(char *bytes, unsigned long long byte_ini = 0);
 	
 	//Retorna el numero (logico) de bloques
-	virtual unsigned int getNumBlocks();
+	virtual unsigned long long getNumBlocks();
 	
 	//Prepara headers recien cargados para un save (incluyendo calculo de data_pos)
 	//Acumula o ajusta las posiciones y agrega el bloque ficticio final (asume que dicho bloque no existe aun)
@@ -109,17 +109,17 @@ public:
 	//Deshace la preparacion desde un cierpo block_ini incluyendo la eliminacion del bloque ficticio
 	//Des-acumula los valores desde ese bloque en adelante
 	//...guardando la posicion de ese bloque y su byte inicial para el proximo prepare
-	virtual void unprepare(unsigned int block_ini = 0);
+	virtual void unprepare(unsigned long long block_ini = 0);
 	
 	//Retorna la posicion absoluta de inicio de un bloque en el archivo terminado
 	//Esto se usa en el write, para saber los bytes que deben preservarse
 	//Notar que el inicio de un bloque se usa tambien para el final del anterior
-	virtual unsigned int getBlockPosition(unsigned int block);
+	virtual unsigned long long getBlockPosition(unsigned long long block);
 	
 	//Propios de Relz
-	unsigned int getFactors(unsigned int block);
-	unsigned int getBytesPos(unsigned int block);
-	unsigned int getBytesLen(unsigned int block);
+	unsigned long long getFactors(unsigned long long block);
+	unsigned long long getBytesPos(unsigned long long block);
+	unsigned long long getBytesLen(unsigned long long block);
 	
 };
 

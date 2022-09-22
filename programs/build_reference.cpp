@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
 	
 	const char *reference_text = argv[1];
 	const char *serialized_reference = argv[2];
-	unsigned int n_threads = atoi(argv[3]);
+	unsigned long long n_threads = atoi(argv[3]);
 	//Dejo la base de golomb por defecto (2^6)
 	
 	cout << "Start (reference \"" << reference_text << "\", output \"" << serialized_reference << "\")\n";
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
 	TextFilter *filter = new TextFilterFull();
 	
 	char *text = NULL;
-	unsigned int text_size = 0;
+	unsigned long long text_size = 0;
 	
 	fstream reader(reference_text, fstream::in);
 	if( ! reader.good() ){
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 	reader.seekg (0, reader.end);
-	unsigned int text_len = reader.tellg();
+	unsigned long long text_len = reader.tellg();
 	reader.seekg (0, reader.beg);
 	reader.close();
 	

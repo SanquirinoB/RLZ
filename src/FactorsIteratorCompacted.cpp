@@ -2,18 +2,18 @@
 
 // Metodos de FactorsIteratorCompacted Normal
 
-void FactorsIteratorCompacted::loadFactor(unsigned int f, bool reset){
+void FactorsIteratorCompacted::loadFactor(unsigned long long f, bool reset){
 //	cout << "FactorsIteratorCompacted::loadFactor - Cargando factor " << f << "\n";
 	cur_f = f;
-	if( cur_f == (unsigned int)(-1) || cur_f >= n_factors){
+	if( cur_f == (unsigned long long)(-1) || cur_f >= n_factors){
 		return;
 	}
 	// Convertir el factor posicional creciente a la posicion EN la permutacion
 	
-	unsigned int cur_pi = (*pi_inv)[cur_f];
-	unsigned int tu = select1_s->operator()(cur_pi + 1) - cur_pi;
-	unsigned int pu = select1_b->operator()(cur_f + 1);
-	unsigned int lu = select1_b->operator()(cur_f + 2) - pu;
+	unsigned long long cur_pi = (*pi_inv)[cur_f];
+	unsigned long long tu = select1_s->operator()(cur_pi + 1) - cur_pi;
+	unsigned long long pu = select1_b->operator()(cur_f + 1);
+	unsigned long long lu = select1_b->operator()(cur_f + 2) - pu;
 	
 //	cout << "FactorsIteratorCompacted::loadFactor - tu: " << tu << ", pu: " << pu << ", lu: " << lu << "\n";
 	cur_f_ini = tu;
@@ -45,13 +45,13 @@ FactorsIteratorCompacted::FactorsIteratorCompacted(){
 	reset();
 }
 
-FactorsIteratorCompacted::FactorsIteratorCompacted( unsigned int _start_f, unsigned int _n_factors, 
+FactorsIteratorCompacted::FactorsIteratorCompacted( unsigned long long _start_f, unsigned long long _n_factors, 
 		bits_s_type::select_1_type *_select1_s, 
 		bits_b_type::select_1_type *_select1_b, 
 		bits_b_type::select_0_type *_select0_b,
 		int_vector<> *_pi_inv,
 		CompactedText *_ref_text,
-		unsigned int _full_size ){
+		unsigned long long _full_size ){
 	start_f = _start_f;
 	n_factors = _n_factors;
 	select1_s = _select1_s;
@@ -94,29 +94,29 @@ bool FactorsIteratorCompacted::hasNext(){
 	return false;
 }
 
-unsigned int FactorsIteratorCompacted::length(){
+unsigned long long FactorsIteratorCompacted::length(){
 	return text_length;
 }
 
-unsigned int FactorsIteratorCompacted::position(){
+unsigned long long FactorsIteratorCompacted::position(){
 	return text_pos;
 }
 
 // Metodos de FactorsIteratorCompactedReverse
 
-void FactorsIteratorCompactedReverse::loadFactor(unsigned int f, bool reset){
+void FactorsIteratorCompactedReverse::loadFactor(unsigned long long f, bool reset){
 //	cout << "FactorsIteratorCompactedReverse::loadFactor - Cargando factor " << f << "\n";
 	cur_f = f;
-	if( cur_f == (unsigned int)(-1) || cur_f >= n_factors){
+	if( cur_f == (unsigned long long)(-1) || cur_f >= n_factors){
 //		cout << "FactorsIteratorCompactedReverse::loadFactor - Factor invalido\n";
 		return;
 	}
 	// Convertir el factor posicional creciente a la posicion EN la permutacion 
 	
-	unsigned int cur_pi = (*pi_inv)[cur_f];
-	unsigned int tu = select1_s->operator()(cur_pi + 1) - cur_pi;
-	unsigned int pu = select1_b->operator()(cur_f + 1);
-	unsigned int lu = select1_b->operator()(cur_f + 2) - pu;
+	unsigned long long cur_pi = (*pi_inv)[cur_f];
+	unsigned long long tu = select1_s->operator()(cur_pi + 1) - cur_pi;
+	unsigned long long pu = select1_b->operator()(cur_f + 1);
+	unsigned long long lu = select1_b->operator()(cur_f + 2) - pu;
 	
 //	cout << "FactorsIteratorCompactedReverse::loadFactor - cur_pi: " << cur_pi << ", tu: " << tu << ", pu: " << pu << ", lu: " << lu << "\n";
 	cur_f_ini = tu;
@@ -150,13 +150,13 @@ FactorsIteratorCompactedReverse::FactorsIteratorCompactedReverse(){
 	reset();
 }
 
-FactorsIteratorCompactedReverse::FactorsIteratorCompactedReverse( unsigned int _start_f, unsigned int _n_factors, 
+FactorsIteratorCompactedReverse::FactorsIteratorCompactedReverse( unsigned long long _start_f, unsigned long long _n_factors, 
 		bits_s_type::select_1_type *_select1_s, 
 		bits_b_type::select_1_type *_select1_b, 
 		bits_b_type::select_0_type *_select0_b, 
 		int_vector<> *_pi_inv,
 		CompactedText *_ref_text,
-		unsigned int _full_size ){
+		unsigned long long _full_size ){
 	start_f = _start_f;
 	n_factors = _n_factors;
 	select1_s = _select1_s;
@@ -196,11 +196,11 @@ bool FactorsIteratorCompactedReverse::hasNext(){
 	return false;
 }
 
-unsigned int FactorsIteratorCompactedReverse::length(){
+unsigned long long FactorsIteratorCompactedReverse::length(){
 	return text_length;
 }
 
-unsigned int FactorsIteratorCompactedReverse::position(){
+unsigned long long FactorsIteratorCompactedReverse::position(){
 	return text_pos;
 }
 

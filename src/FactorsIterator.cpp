@@ -2,16 +2,16 @@
 
 // Metodos de FactorsIterator Normal
 
-void FactorsIterator::loadFactor(unsigned int f, bool reset){
+void FactorsIterator::loadFactor(unsigned long long f, bool reset){
 	cur_f = f;
-	if( cur_f == (unsigned int)(-1) || cur_f >= n_factors){
+	if( cur_f == (unsigned long long)(-1) || cur_f >= n_factors){
 		text_length = 0;
 		text_pos = 0;
 		return;
 	}
 	// Convertir el factor posicional creciente a la posicion EN la permutacion
-	unsigned int pu = select1_b->operator()(cur_f + 1);
-	unsigned int lu = select1_b->operator()(cur_f + 2) - pu;	
+	unsigned long long pu = select1_b->operator()(cur_f + 1);
+	unsigned long long lu = select1_b->operator()(cur_f + 2) - pu;	
 
    cur_pos = 1;
    cur_f_fin = lu;	
@@ -43,7 +43,7 @@ FactorsIterator::FactorsIterator(){
 	reset();
 }
 
-FactorsIterator::FactorsIterator( unsigned int _start_f, unsigned int _n_factors, 
+FactorsIterator::FactorsIterator( unsigned long long _start_f, unsigned long long _n_factors, 
 		bits_s_type::select_1_type *_select1_s, 
 		bits_b_type::select_1_type *_select1_b, 
 		bits_b_type::select_0_type *_select0_b,
@@ -52,7 +52,7 @@ FactorsIterator::FactorsIterator( unsigned int _start_f, unsigned int _n_factors
 		int_vector<> *_arr_x_new,
 		const char *_ref_text,
 		fm_index_type *_fm_index,
-		unsigned int _full_size ){
+		unsigned long long _full_size ){
 	start_f = _start_f;
 	n_factors = _n_factors;
 	select1_s = _select1_s;
@@ -113,27 +113,27 @@ bool FactorsIterator::hasNext(){
 	return false;
 }
 
-unsigned int FactorsIterator::length(){
+unsigned long long FactorsIterator::length(){
 	return text_length;
 }
 
-unsigned int FactorsIterator::position(){
+unsigned long long FactorsIterator::position(){
 	return text_pos;
 }
 
 // Metodos de FactorsIteratorReverse
 
-void FactorsIteratorReverse::loadFactor(unsigned int f, bool reset){
+void FactorsIteratorReverse::loadFactor(unsigned long long f, bool reset){
 	cur_f = f;
-	if( cur_f == (unsigned int)(-1) || cur_f >= n_factors){
+	if( cur_f == (unsigned long long)(-1) || cur_f >= n_factors){
 		text_length = 0;
 		text_pos = 0;
 		return;
 	}
 	// Convertir el factor posicional creciente a la posicion EN la permutacion 
 	
-	unsigned int pu = select1_b->operator()(cur_f + 1);
-	unsigned int lu = select1_b->operator()(cur_f + 2) - pu;
+	unsigned long long pu = select1_b->operator()(cur_f + 1);
+	unsigned long long lu = select1_b->operator()(cur_f + 2) - pu;
 	   
    bwt_pos = (*arr_x_new)[cur_f];	
    
@@ -166,7 +166,7 @@ FactorsIteratorReverse::FactorsIteratorReverse(){
 	reset();
 }
 
-FactorsIteratorReverse::FactorsIteratorReverse( unsigned int _start_f, unsigned int _n_factors, 
+FactorsIteratorReverse::FactorsIteratorReverse( unsigned long long _start_f, unsigned long long _n_factors, 
 		bits_s_type::select_1_type *_select1_s, 
 		bits_b_type::select_1_type *_select1_b, 
 		bits_b_type::select_0_type *_select0_b, 
@@ -175,7 +175,7 @@ FactorsIteratorReverse::FactorsIteratorReverse( unsigned int _start_f, unsigned 
 		int_vector<> *_arr_x_new,
 		const char *_ref_text,
 		fm_index_type *_fm_index,
-		unsigned int _full_size ){
+		unsigned long long _full_size ){
 	start_f = _start_f;
 	n_factors = _n_factors;
 	select1_s = _select1_s;
@@ -220,11 +220,11 @@ bool FactorsIteratorReverse::hasNext(){
 	return false;
 }
 
-unsigned int FactorsIteratorReverse::length(){
+unsigned long long FactorsIteratorReverse::length(){
 	return text_length;
 }
 
-unsigned int FactorsIteratorReverse::position(){
+unsigned long long FactorsIteratorReverse::position(){
 	return text_pos;
 }
 

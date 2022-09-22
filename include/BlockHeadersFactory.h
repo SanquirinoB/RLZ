@@ -43,7 +43,7 @@ public:
 	static void save(BlockHeaders *headers, fstream *writer);
 	
 	// Retorna el numero de bytes de type
-	static unsigned int typeSize();
+	static unsigned long long typeSize();
 	
 };
 

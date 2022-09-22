@@ -26,32 +26,32 @@ class ReferenceIndexBasic : public ReferenceIndex{
 
 private:
 	//Largo (producto de strlen) del string referencia
-	unsigned int largo;
+	unsigned long long largo;
 	//String referencia. Podria contener largo ceros adicionales (para simplificar operaciones)
 	unsigned char *ref;
 	//Arreglo de sufijos explicito
-	unsigned int *arr;
+	unsigned long long *arr;
 
 	//Contadores para la prueba de uso (notar que es del mismo largo que arr)
-	unsigned int *arr_uso;
+	unsigned long long *arr_uso;
 	
 public: 
 	
 	void printArrUso(){
-		for(unsigned int i = 0 ; i < largo; ++i){
+		for(unsigned long long i = 0 ; i < largo; ++i){
 			cout<<"arr_uso "<<i<<" "<<arr_uso[i]<<"\n";
 		}
 	}
 	
 	ReferenceIndexBasic();
 	
-	ReferenceIndexBasic(const char *_referencia, unsigned int n_threads = 4);
+	ReferenceIndexBasic(const char *_referencia, unsigned long long n_threads = 4);
 	
 	virtual ~ReferenceIndexBasic();
 	
 	//Busca el "text" en el arreglo de sufijos
 	//Guarda la posicio y el largo del mayor prefijo comun
-	virtual void find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const;
+	virtual void find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const;
 	
 	//Metodos de save para carga sin construccion
 	virtual void save(const char *ref_file);
@@ -66,7 +66,7 @@ public:
 	//Metodos de carga sin construccion
 	virtual void load(const char *ref_file);
 	
-	unsigned int getLength(){
+	unsigned long long getLength(){
 		return largo;
 	}
 	
@@ -78,11 +78,11 @@ public:
 	// Tambien considera un cierto min_length para considerar las busquedas validas
 	// Si no encuentra un sufijo comun de largo min_length o mas, omite el resultado
 	// Mientras busca el sufijo, comienza a probar el rango valido solo si ya tiene min_length o mas encontrado
-	virtual void find(const char *text, unsigned int size, unsigned int &position, unsigned int &length, unsigned int min_length, bool *arr_valid) const;
+	virtual void find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length, unsigned long long min_length, bool *arr_valid) const;
 	
 	// De forma similar a find, busca "text" de largo "size" en el arreglo de sufijos
 	// Esta version busca el texto completo y almacena todas las ocurrencias en "res", ordenadas crecientemente
-	virtual void search(const char *text, unsigned int size, vector<unsigned int> &res) const;
+	virtual void search(const char *text, unsigned long long size, vector<unsigned long long> &res) const;
 	
 	
 };

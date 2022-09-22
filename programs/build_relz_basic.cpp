@@ -49,13 +49,13 @@ int main(int argc, char* argv[]){
 		new DecoderBlocksRelz(reference->getText()), 
 		filter
 	);
-	vector<pair<unsigned int, unsigned int> > factors;
+	vector<pair<unsigned long long, unsigned long long> > factors;
 	unsigned long long len_text = 0;
 	char *text = compressor.compressFactors(input, 1000000, len_text, &factors);
 	cout << "Full text loaded of " << len_text << " chars\n";
 	
 	const char *ref = reference->getText();
-	unsigned int len_ref = reference->getLength();
+	unsigned long long len_ref = reference->getLength();
 	
 	cout << "----- Building index -----\n";
 	NanoTimer timer;

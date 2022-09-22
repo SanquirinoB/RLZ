@@ -1,7 +1,7 @@
 199c199
-< void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+< void RelzIndexReference::findTimes(const string &pattern, vector<unsigned long long> &results){
 ---
-> /*void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+> /*void RelzIndexReference::findTimes(const string &pattern, vector<unsigned long long> &results){
 276a277,786
 > */
 > 
@@ -12,7 +12,7 @@
 > 
 > extern uint64_t COUNT;
 > 
-> void RelzIndexReference::findTimes(const string &pattern, vector<unsigned int> &results){
+> void RelzIndexReference::findTimes(const string &pattern, vector<unsigned long long> &results){
 > 
 > 	//cout << "RelzIndex::findTimes - Start (\"" << pattern << "\")" << COUNT++ << endl;
 > 	NanoTimer timer;
@@ -31,18 +31,18 @@
 > 	timer.reset();
 > 
 > 	for( int_vector<64> locations : arr_locations ){
-> 		for( unsigned int i = 0; i < occs; ++i ){
-> 			unsigned int occ_i = locations[i];
+> 		for( unsigned long long i = 0; i < occs; ++i ){
+> 			unsigned long long occ_i = locations[i];
 > 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
-> 			unsigned int select = select0_s(occ_i + 1);
-> 			unsigned int pos_ez = select - 1 - occ_i;
+> 			unsigned long long select = select0_s(occ_i + 1);
+> 			unsigned long long pos_ez = select - 1 - occ_i;
 > 			// Now the recursive search in rmq (0 - pos_ez)
 > 			if( occ_i >= select ){
 > 				continue;
 > 			}
 > //
->             unsigned int tu, pu, lu;
->             unsigned int pos_max = pos_ez;
+>             unsigned long long tu, pu, lu;
+>             unsigned long long pos_max = pos_ez;
 >             if( precompute_rmq ){
 >                 tu = arr_tu[pos_max];
 >                 pu = arr_pu[pos_max];
@@ -54,10 +54,10 @@
 >                 lu = select1_b(pi[pos_max] + 2) - pu;
 >             }
 > 
->             unsigned int cant_iters = pos_ez;
->             unsigned int a = 0, ncases = 0, niters;
+>             unsigned long long cant_iters = pos_ez;
+>             unsigned long long a = 0, ncases = 0, niters;
 >             bool found = true;
->             unsigned int occim = occ_i+m;
+>             unsigned long long occim = occ_i+m;
 >             
 >             while (a < cant_iters && found) {
 >                 niters = 0;
@@ -139,13 +139,13 @@
 > 
 >     getchar ();
 >     */
->     unsigned int /***/first_coord_x/* = new uint64_t*/[patt_len];
->     unsigned int /***/second_coord_x/* = new uint64_t*/[patt_len];
->     unsigned int /***/first_coord_y/* = new uint64_t*/[patt_len];
->     unsigned int /***/second_coord_y/* = new uint64_t*/[patt_len];
+>     unsigned long long /***/first_coord_x/* = new uint64_t*/[patt_len];
+>     unsigned long long /***/second_coord_x/* = new uint64_t*/[patt_len];
+>     unsigned long long /***/first_coord_y/* = new uint64_t*/[patt_len];
+>     unsigned long long /***/second_coord_y/* = new uint64_t*/[patt_len];
 > 
->     unsigned int /***/result_first_x[patt_len], /***/result_first_y[patt_len];
->     unsigned int /***/result_second_x[patt_len], /***/result_second_y[patt_len];
+>     unsigned long long /***/result_first_x[patt_len], /***/result_first_y[patt_len];
+>     unsigned long long /***/result_second_x[patt_len], /***/result_second_y[patt_len];
 > 
 >     getRangesX(0, n_factors-1, suff_x, 1, patt_len-1, first_coord_x, patt_rev, patt_len-1, 0, false); 
 >     getRangesX(0, n_factors-1, suff_x_2, 1, patt_len-1, second_coord_x, patt_rev_2, patt_len-1, 0, true); 
@@ -156,7 +156,7 @@
 >     for (uint64_t a = 0; a < patt_len; a++) {
 >         result_first_x[patt_len-suff_x[a]] = first_coord_x[a];
 >         result_second_x[patt_len-suff_x_2[a]] = second_coord_x[a];
->         if (first_coord_x[a] == (unsigned int)(-1) || second_coord_x[a] == (unsigned int)(-1) || first_coord_x[a] > second_coord_x[a]) {
+>         if (first_coord_x[a] == (unsigned long long)(-1) || second_coord_x[a] == (unsigned long long)(-1) || first_coord_x[a] > second_coord_x[a]) {
 >             flags1[patt_len-suff_x[a]] = false;
 >             flags2[patt_len-suff_x_2[a]] = false;
 >         }
@@ -180,9 +180,9 @@
 >         
 >     /*****/
 >     //if (pattern.length() > 1000)
->     for(unsigned int i = 1; i < pattern.length(); ++i){
+>     for(unsigned long long i = 1; i < pattern.length(); ++i){
 > 		// Rango X
-> 	pair<unsigned int, unsigned int> r1; // = getRangeX(p1_rev.c_str());
+> 	pair<unsigned long long, unsigned long long> r1; // = getRangeX(p1_rev.c_str());
 > 	timer.reset();
 > 
 >         /*if (result_first_x[i] != r1.first) cout << "X first " << result_first_x[i] << " " << r1.first << " " << r1.second << endl; 
@@ -192,11 +192,11 @@
 >         r1.first = result_first_x[i];
 >         r1.second = result_second_x[i]/*-1*/;
 >         
-> 	if( r1.first == (unsigned int)(-1) || r1.second == (unsigned int)(-1) || r1.second < r1.first )
+> 	if( r1.first == (unsigned long long)(-1) || r1.second == (unsigned long long)(-1) || r1.second < r1.first )
 >             continue;
 > 
 > 	// Rango Y
-> 	pair<unsigned int, unsigned int> r2;// = getRangeY(p2.c_str());
+> 	pair<unsigned long long, unsigned long long> r2;// = getRangeY(p2.c_str());
 > 
 >         /*if (result_first_y[i] != r2.first) cout << "Y first " << result_first_y[i] << " " << r2.first << " " << r2.second << endl; 
 >         if (result_second_y[i] != r2.second) {
@@ -212,8 +212,8 @@
 > 
 >         auto res = wt.range_search_2d(r1.first, r1.second, r2.first, r2.second);
 > 	for (auto point : res.second){
-> 	    unsigned int f = arr_y[point.second];
-> 	    unsigned int pu = select1_b(f + 1);
+> 	    unsigned long long f = arr_y[point.second];
+> 	    unsigned long long pu = select1_b(f + 1);
 > 	    results.push_back(pu - i/*p1.length()*/);
 > 	    ++occs_c;
 > 	}	
@@ -314,7 +314,7 @@
 > 
 > 
 > void RelzIndexReference::getRangesY(uint64_t Y_l, uint64_t Y_r, uint64_t* suff, 
->                            uint64_t left, uint64_t right, unsigned int* output,
+>                            uint64_t left, uint64_t right, unsigned long long* output,
 >                            char *pattern, uint64_t patt_len, bool *flags, bool isright) 
 > {
 >     if ((int64_t)left > (int64_t)right) return;
@@ -409,7 +409,7 @@
 > 
 > 
 > void RelzIndexReference::getRangesX(uint64_t Y_l, uint64_t Y_r, uint64_t* suff, 
->                            uint64_t left, uint64_t right, unsigned int * output,
+>                            uint64_t left, uint64_t right, unsigned long long * output,
 >                            char *pattern, uint64_t patt_len, uint64_t level, bool isright) 
 > {
 >     if ((int64_t)left > (int64_t)right) return;
@@ -433,7 +433,7 @@
 >             FactorsIteratorCompactedReverse it(pos-1, n_factors, &select1_s, &select1_b,
 >                                       &select0_b, &pi_inv, ref_text, len_text);
 >             if(it.length() == 0 ){
->                for (uint64_t i = left; i <= right; i++) output[i] = (unsigned int)-1;
+>                for (uint64_t i = left; i <= right; i++) output[i] = (unsigned long long)-1;
 >                return; // OJO con esto
 >             }
 > 
@@ -476,7 +476,7 @@
 >         if(it.length() == 0 ){
 >             //cout << "Cuidado que retorna por aquí X" << endl;
 >             //fflush(stdout);
->             //for (uint64_t i = left; i <= right; i++) output[i] = (unsigned int) -1;
+>             //for (uint64_t i = left; i <= right; i++) output[i] = (unsigned long long) -1;
 > 	    return; // OJO con esto
 > 	}
 > 	it.setMaxLength(patt_len);

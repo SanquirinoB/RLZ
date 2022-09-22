@@ -8,7 +8,7 @@ RelzIndex::RelzIndex(){
 	omit_text = false;
 }
 
-RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *full_text, unsigned int _len_text, const char *_ref_text, unsigned int _len_ref, bool _omit_text){
+RelzIndex::RelzIndex(vector<pair<unsigned long long, unsigned long long> > &factors, char *full_text, unsigned long long _len_text, const char *_ref_text, unsigned long long _len_ref, bool _omit_text){
 	
 	len_text = _len_text;
 	len_ref = _len_ref;
@@ -29,15 +29,15 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	cout << "RelzIndex - Preparing Factors\n";
 	// Factores en version ini, fin (absoluto) y ordenados por ini
-	vector<pair<unsigned int, pair<unsigned int, unsigned int> > > factors_sort;
-	vector<unsigned int> factors_start;
-	unsigned int cur_start = 0;
-	unsigned int cur_pos = 0;
-	for( pair<unsigned int, unsigned int> factor : factors ){
+	vector<pair<unsigned long long, pair<unsigned long long, unsigned long long> > > factors_sort;
+	vector<unsigned long long> factors_start;
+	unsigned long long cur_start = 0;
+	unsigned long long cur_pos = 0;
+	for( pair<unsigned long long, unsigned long long> factor : factors ){
 //		cout << "(" << factor.first << ", " << factor.second << ", " << cur_pos << ") - cur_start: " << cur_start << "\n";
 		factors_sort.push_back( 
-			pair<unsigned int, pair<unsigned int, unsigned int> >(
-				factor.first, pair<unsigned int, unsigned int>(factor.first + factor.second - 1, cur_pos++)
+			pair<unsigned long long, pair<unsigned long long, unsigned long long> >(
+				factor.first, pair<unsigned long long, unsigned long long>(factor.first + factor.second - 1, cur_pos++)
 				)
 			);
 		factors_start.push_back(cur_start);
@@ -47,7 +47,7 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	cout << "RelzIndex - Factors Sorted prepared in " << timer.getMilisec() << "\n";
 	timer.reset();
 //	cout << "Factors Sorted: \n";
-//	for( pair<unsigned int, pair<unsigned int, unsigned int> > factor : factors_sort ){
+//	for( pair<unsigned long long, pair<unsigned long long, unsigned long long> > factor : factors_sort ){
 //		cout << "(" << factor.first << ", " << factor.second.first << ", " << factor.second.second << ")\n";
 //	}
 	
@@ -56,8 +56,8 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	bit_vector arr_s = bit_vector(len_ref + n_factors, 0);
 	unsigned cur_ref = 0;
 	cur_pos = 0;
-	for( unsigned int i = 0; i < n_factors; ++i ){
-		unsigned int ini = factors_sort[i].first;
+	for( unsigned long long i = 0; i < n_factors; ++i ){
+		unsigned long long ini = factors_sort[i].first;
 		if( ini == cur_ref ){
 			arr_s[cur_pos++] = 1;
 		}
@@ -78,7 +78,7 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	cout << "RelzIndex - Preparing Permutation PI\n";
 	pi = int_vector<>(n_factors);
 	pi_inv = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		pi[i] = factors_sort[i].second.second;
 		pi_inv[ factors_sort[i].second.second ] = i;
 	}
@@ -88,7 +88,7 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	// Posiciones finales Ez
 	int_vector<> ez = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		ez[i] = factors_sort[i].second.first;
 	}
 	rmq = rmq_type(&ez);
@@ -96,9 +96,9 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	// Bit vector B (inicio de las frases en texto)
 	cout << "RelzIndex - Preparing Vector B\n";
 	bit_vector arr_b(len_text, 0);
-	unsigned int pos_text = 0;
-	for( unsigned int i = 0; i < n_factors; ++i ){
-		unsigned int len = factors[i].second;
+	unsigned long long pos_text = 0;
+	for( unsigned long long i = 0; i < n_factors; ++i ){
+		unsigned long long len = factors[i].second;
 		arr_b[ pos_text ] = 1;
 		pos_text += len;
 	}
@@ -119,24 +119,24 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	// Permutacion 
 	cout << "RelzIndex - Preparing New Version of Permutation PI_INV\n";
 	pi_inv_new = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		pi_inv_new[i] = fm_index.isa[select1_s(pi_inv[i]+1)-pi_inv[i]+1]; // OJO, posible fuente de error
 	}
 	
 	cout << "RelzIndex - PI prepared in " << timer.getMilisec() << "\n";
 	timer.reset();
 
-/*   unsigned int pos;
-   unsigned int tu, lu, pu;
-   for (unsigned int i = 0; i < n_factors; ++i) {
+/*   unsigned long long pos;
+   unsigned long long tu, lu, pu;
+   for (unsigned long long i = 0; i < n_factors; ++i) {
        tu = select1_s(pi_inv[i] + 1) - pi_inv[i];
        pu = select1_b(i+1);
        lu = select1_b(i + 2) - pu;
        pos = tu;
     	 cout << i << "/" << n_factors << " " << lu << endl; 
        char c1, c2;       
-       unsigned int bwt_pos = pi_inv_new[i];
-       for (unsigned int j = 0; j < lu; j++) {
+       unsigned long long bwt_pos = pi_inv_new[i];
+       for (unsigned long long j = 0; j < lu; j++) {
            //cout << "  " << j << "/" << lu << endl;           
            c1 = extract(fm_index, pos, pos)[0]; 
            c2 = fm_index.bwt[bwt_pos];
@@ -150,20 +150,20 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	// Preparacion de permutaciones X e Y
 	cout << "RelzIndex - Preparing arr X\n";
-	vector<unsigned int> arr_x_original(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	vector<unsigned long long> arr_x_original(n_factors);
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x_original[i] = i;
 	}
 	FactorsFastIteratorReverseComparator comp_rev(&factors_start, full_text, len_text);
 	stable_sort(arr_x_original.begin(), arr_x_original.end(), comp_rev);
 	arr_x = int_vector<>(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x[i] = arr_x_original[i];
 	}
 
 	arr_x_new = int_vector<>(n_factors);
-	unsigned int tu, lu, pu, cur_f, cur_pi;
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	unsigned long long tu, lu, pu, cur_f, cur_pi;
+	for( unsigned long long i = 0; i < n_factors; ++i ){
                 cur_f = arr_x[i];
                 cur_pi = pi_inv[cur_f];
 		tu = select1_s(cur_pi+1)-cur_pi;
@@ -179,11 +179,11 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	}
 
 	
-//	for( unsigned int i = 0; i < n_factors; ++i ){
+//	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_x[" << i << "]: " << arr_x[i] << " -> ";
 //		char c = 0;
 //		FactorsIteratorReverse it(arr_x[i] - 1, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, (omit_text)?NULL:ref_text, &fm_index, len_text);
-//		for(unsigned int k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
+//		for(unsigned long long k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
 //			cout << c;
 //		cout << "\n";
 //	}
@@ -191,8 +191,8 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	cout << "RelzIndex - Preparing arr Y\n";
 	
-	vector<unsigned int> arr_y_original(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	vector<unsigned long long> arr_y_original(n_factors);
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_y_original[i] = i;
 	}
 	FactorsFastIteratorComparator comp(&factors_start, full_text, len_text);
@@ -200,16 +200,16 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	arr_y = int_vector<>(n_factors);
 	int_vector<> arr_y_inv(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_y[i] = arr_y_original[i];
 		arr_y_inv[ arr_y_original[i] ] = i;
 	}
 	
-//	for( unsigned int i = 0; i < n_factors; ++i ){
+//	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_y[" << i << "]: " << arr_y[i] << " -> ";
 //		char c = 0;
 //		FactorsIterator it(arr_y[i], n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, (omit_text)?NULL:ref_text, &fm_index, len_text);
-//		for(unsigned int k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
+//		for(unsigned long long k = 0; k < 20 && it.hasNext() && (c = it.next()) != 0; ++k ) 
 //			cout << c;
 //		cout << " (" << it.length() << ")\n";
 //	}
@@ -220,7 +220,7 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	cout << "RelzIndex - Preparing WT\n";
 	int_vector<> values_wt(n_factors);
-	for( unsigned int i = 0; i < n_factors; ++i ){
+	for( unsigned long long i = 0; i < n_factors; ++i ){
 		values_wt[i] = arr_y_inv[ arr_x[ i ] ];
 	}
 	construct_im(wt, values_wt);
@@ -229,10 +229,10 @@ RelzIndex::RelzIndex(vector<pair<unsigned int, unsigned int> > &factors, char *f
 	
 	// Prueba de aceleracion de recursive_rmq almacenando los datos de los factores descomprimidos
 	if(precompute_rmq){
-		for( unsigned int i = 0; i < n_factors; ++i ){
-			unsigned int tu = select1_s(i + 1) - i;
-			unsigned int pu = select1_b(pi[i] + 1);
-			unsigned int lu = select1_b(pi[i] + 2) - pu;
+		for( unsigned long long i = 0; i < n_factors; ++i ){
+			unsigned long long tu = select1_s(i + 1) - i;
+			unsigned long long pu = select1_b(pi[i] + 1);
+			unsigned long long lu = select1_b(pi[i] + 2) - pu;
 			arr_tu.push_back(tu);
 			arr_pu.push_back(pu);
 			arr_lu.push_back(lu);
@@ -259,9 +259,9 @@ RelzIndex::~RelzIndex(){
 }
 
 
-unsigned int Q = 0;
+unsigned long long Q = 0;
 
-void RelzIndex::findTimes(const string &pattern, vector<unsigned int> &results){
+void RelzIndex::findTimes(const string &pattern, vector<unsigned long long> &results){
 
 //	cout << "RelzIndex::findTimes - Start (\"" << pattern << "\")\n";
 	NanoTimer timer;
@@ -282,11 +282,11 @@ void RelzIndex::findTimes(const string &pattern, vector<unsigned int> &results){
 	timer.reset();
 	
 	for( int_vector<64> locations : arr_locations ){
-		for( unsigned int i = 0; i < occs; ++i ){
-			unsigned int occ_i = locations[i];
+		for( unsigned long long i = 0; i < occs; ++i ){
+			unsigned long long occ_i = locations[i];
 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
-			unsigned int select = select0_s(occ_i + 1);
-			unsigned int pos_ez = select - 1 - occ_i;
+			unsigned long long select = select0_s(occ_i + 1);
+			unsigned long long pos_ez = select - 1 - occ_i;
 			// Now the recursive search in rmq (0 - pos_ez)
 			if( occ_i >= select ){
 				continue;
@@ -297,37 +297,37 @@ void RelzIndex::findTimes(const string &pattern, vector<unsigned int> &results){
 	querytime_p2 += timer.getNanosec();
 	
 //	cout << "RelzIndex::findTimes - Section B, ranges\n";
-	for(unsigned int i = 1; i < pattern.length(); ++i){
+	for(unsigned long long i = 1; i < pattern.length(); ++i){
 		timer.reset();
 		string p1 = pattern.substr(0, i);
 		string p1_rev = "";
-		for( unsigned int k = 0; k < p1.length(); ++k ){
+		for( unsigned long long k = 0; k < p1.length(); ++k ){
 			p1_rev += p1[ p1.length() - 1 - k ];
 		}
 		string p2 = pattern.substr(i, pattern.length() - i);
 
 		// Rango X
-		pair<unsigned int, unsigned int> r1 = getRangeX(p1_rev.c_str());
+		pair<unsigned long long, unsigned long long> r1 = getRangeX(p1_rev.c_str());
 		querytime_p3 += timer.getNanosec();
 		timer.reset();
 		
-		if( r1.first == (unsigned int)(-1) || r1.second == (unsigned int)(-1) || r1.second < r1.first )
+		if( r1.first == (unsigned long long)(-1) || r1.second == (unsigned long long)(-1) || r1.second < r1.first )
 			continue;
 		
 				
 		// Rango Y
-		pair<unsigned int, unsigned int> r2 = getRangeY(p2.c_str());
+		pair<unsigned long long, unsigned long long> r2 = getRangeY(p2.c_str());
 		querytime_p3 += timer.getNanosec();
 		timer.reset();
 		
-		if( r2.first == (unsigned int)(-1) || r2.second == (unsigned int)(-1) || r2.second < r2.first )
+		if( r2.first == (unsigned long long)(-1) || r2.second == (unsigned long long)(-1) || r2.second < r2.first )
 			continue;
 	
 			   
       auto res = wt.range_search_2d(r1.first, r1.second, r2.first, r2.second);
 		for (auto point : res.second){
-			unsigned int f = arr_y[point.second];
-			unsigned int pu = select1_b(f + 1);
+			unsigned long long f = arr_y[point.second];
+			unsigned long long pu = select1_b(f + 1);
 //			cout << "RelzIndex::findTimes - Adding pos " << (pu - p1.length()) << "\n";
 			results.push_back(pu - p1.length());
 			++occs_c;
@@ -339,16 +339,16 @@ void RelzIndex::findTimes(const string &pattern, vector<unsigned int> &results){
 }
 
 
-void RelzIndex::recursive_rmq(unsigned int ini, unsigned int fin, unsigned int min_pos, unsigned int occ_ref, vector<unsigned int> &results){
+void RelzIndex::recursive_rmq(unsigned long long ini, unsigned long long fin, unsigned long long min_pos, unsigned long long occ_ref, vector<unsigned long long> &results){
 //	cout << "RelzIndex::recursive_rmq - " << ini << ", " << fin << "\n";
 	
-	unsigned int pos_max = rmq(ini, fin);
+	unsigned long long pos_max = rmq(ini, fin);
 	
 //	cout << "RelzIndex::recursive_rmq - Computing factor\n";
 	assert(pos_max < n_factors);
-	unsigned int tu = 0;
-	unsigned int pu = 0;
-	unsigned int lu = 0;
+	unsigned long long tu = 0;
+	unsigned long long pu = 0;
+	unsigned long long lu = 0;
 	if( precompute_rmq ){
 		tu = arr_tu[pos_max];
 		pu = arr_pu[pos_max];
@@ -382,8 +382,8 @@ void RelzIndex::recursive_rmq(unsigned int ini, unsigned int fin, unsigned int m
 
 
 template <typename ItereatorType>
-bool RelzIndex::factorLess(unsigned int factor, const char *pattern, unsigned int len, bool equal){
-	if( factor == (unsigned int)(-1) ){
+bool RelzIndex::factorLess(unsigned long long factor, const char *pattern, unsigned long long len, bool equal){
+	if( factor == (unsigned long long)(-1) ){
 		return true;
 	}
 	ItereatorType it(factor, n_factors, &select1_s, &select1_b, &select0_b, &pi_inv, &pi_inv_new, &arr_x_new, (omit_text)?NULL:ref_text, &fm_index, len_text);
@@ -393,7 +393,7 @@ bool RelzIndex::factorLess(unsigned int factor, const char *pattern, unsigned in
 	it.setMaxLength(len);
 	
 	char c1 = it.next();
-	unsigned int pos = 0;
+	unsigned long long pos = 0;
 	char c2 = pattern[pos++];
 	bool next = true;
 //	cout << "RelzIndex::factorLess - " << c1 << " vs " << c2 << "\n";
@@ -426,14 +426,14 @@ bool RelzIndex::factorLess(unsigned int factor, const char *pattern, unsigned in
 
 // Notar que, a diferencia de la busqueda en referencia, esta debe ser completa
 // Es decir, solo importa el rango que contiene al patron completo
-pair<unsigned int, unsigned int> RelzIndex::getRangeY(const char *pattern){
+pair<unsigned long long, unsigned long long> RelzIndex::getRangeY(const char *pattern){
 	
 	// Version de Revision completa
 	
-	unsigned int izq = -1;
-	unsigned int der = -1;
-	unsigned int pat_len = strlen(pattern);
-	unsigned int l, h, m, fm;
+	unsigned long long izq = -1;
+	unsigned long long der = -1;
+	unsigned long long pat_len = strlen(pattern);
+	unsigned long long l, h, m, fm;
 	
 	// Busqueda binaria del lado izquierdo
 //	cout << "getRangeY - Busqueda Izquierda\n";
@@ -474,19 +474,19 @@ pair<unsigned int, unsigned int> RelzIndex::getRangeY(const char *pattern){
 	if( !factorLess<FactorsIterator>(fm, pattern, pat_len, true) ){
 		--der;
 	}
-	return pair<unsigned int, unsigned int>(izq, der);
+	return pair<unsigned long long, unsigned long long>(izq, der);
 }
 
 #define LEVEL_BINARY_SEARCH 20 
 
-pair<unsigned int, unsigned int> RelzIndex::getRangeX(const char *pattern){
+pair<unsigned long long, unsigned long long> RelzIndex::getRangeX(const char *pattern){
 	
 	// Version de Revision completa
 	
-	unsigned int izq = -1;
-	unsigned int der = -1;
-	unsigned int pat_len = strlen(pattern);
-	unsigned int l, h, m, fm, level;
+	unsigned long long izq = -1;
+	unsigned long long der = -1;
+	unsigned long long pat_len = strlen(pattern);
+	unsigned long long l, h, m, fm, level;
 	
 	// Busqueda binaria del lado izquierdo
 	l = 0;
@@ -541,7 +541,7 @@ pair<unsigned int, unsigned int> RelzIndex::getRangeX(const char *pattern){
 		--der;
 	}
 
-	return pair<unsigned int, unsigned int>(izq, der);
+	return pair<unsigned long long, unsigned long long>(izq, der);
 }
 
 void RelzIndex::printSize(){
@@ -743,10 +743,10 @@ void RelzIndex::load(const string &file_base){
 	load_from_file(wt, wt_file);
 	
 	if(precompute_rmq){
-		for( unsigned int i = 0; i < n_factors; ++i ){
-			unsigned int tu = select1_s(i + 1) - i;
-			unsigned int pu = select1_b(pi[i] + 1);
-			unsigned int lu = select1_b(pi[i] + 2) - pu;
+		for( unsigned long long i = 0; i < n_factors; ++i ){
+			unsigned long long tu = select1_s(i + 1) - i;
+			unsigned long long pu = select1_b(pi[i] + 1);
+			unsigned long long lu = select1_b(pi[i] + 2) - pu;
 			arr_tu.push_back(tu);
 			arr_pu.push_back(pu);
 			arr_lu.push_back(lu);

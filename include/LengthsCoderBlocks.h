@@ -22,12 +22,12 @@ class LengthsCoderBlocks{
 private: 
 	BitsUtils utils;
 	const char *nombre_archivo;
-	unsigned int buff_size;
-	unsigned int *buff;
-	unsigned int byte_ini;
+	unsigned long long buff_size;
+	unsigned long long *buff;
+	unsigned long long byte_ini;
 	
 	void deleteBuffer();
-	void prepareBuffer(unsigned int new_size);
+	void prepareBuffer(unsigned long long new_size);
 	
 public: 
 	
@@ -43,17 +43,17 @@ public:
 	virtual ~LengthsCoderBlocks();
 	
 	//Metodo de Lectura o Escritura
-	void setGolombBase(unsigned int potencia_base);
+	void setGolombBase(unsigned long long potencia_base);
 	
 	//Como el anterior, pero escribe en un archivo dado
 	//Retorna el numero de bytes escritos
-	unsigned int encodeBlockGolomb(unsigned int *arr_len, unsigned int n_factores, fstream *escritor);
+	unsigned long long encodeBlockGolomb(unsigned long long *arr_len, unsigned long long n_factores, fstream *escritor);
 	
 	//Metodo de Lectura
-	void open(const char *_nombre_archivo, unsigned int _byte_ini = 0);
+	void open(const char *_nombre_archivo, unsigned long long _byte_ini = 0);
 	
 	//Metodo de Lectura
-	void decodeBlockGolomb(unsigned int byte_start, unsigned int n_bytes, unsigned int n_factores, unsigned int *arr_len);
+	void decodeBlockGolomb(unsigned long long byte_start, unsigned long long n_bytes, unsigned long long n_factores, unsigned long long *arr_len);
 	
 };
 

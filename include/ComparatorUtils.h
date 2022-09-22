@@ -8,20 +8,20 @@
 using namespace std;
 
 //Coparador Basico de texto para Suffix Array
-class SAComparator : public std::binary_function<unsigned int, unsigned int, bool> {
+class SAComparator : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
 	unsigned char *ref;
-	unsigned int largo;
+	unsigned long long largo;
 public:
 	SAComparator(){
 		ref = NULL;
 		largo = 0;
 	}
-	SAComparator(unsigned char *_ref, unsigned int _largo){
+	SAComparator(unsigned char *_ref, unsigned long long _largo){
 		ref = _ref;
 		largo = _largo;
 	}
-	inline bool operator()(const unsigned int a, const unsigned int b){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
 		//return lexicographical_compare(&(ref[a]), &(ref[a])+(largo-a), &(ref[b]), &(ref[b])+(largo-b));
 		if( a > largo ){
 			return true;
@@ -40,20 +40,20 @@ public:
 };
 
 //Comparador para el primer nivel de buckets (omite 1 caracter)
-class SAComparatorN1 : public std::binary_function<unsigned int, unsigned int, bool> {
+class SAComparatorN1 : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
 	unsigned char *ref;
-	unsigned int largo;
+	unsigned long long largo;
 public:
 	SAComparatorN1(){
 		ref = NULL;
 		largo = 0;
 	}
-	SAComparatorN1(unsigned char *_ref, unsigned int _largo){
+	SAComparatorN1(unsigned char *_ref, unsigned long long _largo){
 		ref = _ref;
 		largo = _largo;
 	}
-	inline bool operator()(const unsigned int a, const unsigned int b){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
 //		return lexicographical_compare(&(ref[a])+1, &(ref[a])+(largo-a), &(ref[b])+1, &(ref[b])+(largo-b));
 		//En este caso debe verificarse si hay string nulos
 		if( a > largo-1 ){
@@ -73,20 +73,20 @@ public:
 };
 
 //Comparador para el segundo nivel de buckets (omite 2 caracter)
-class SAComparatorN2 : public std::binary_function<unsigned int, unsigned int, bool> {
+class SAComparatorN2 : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
 	unsigned char *ref;
-	unsigned int largo;
+	unsigned long long largo;
 public:
 	SAComparatorN2(){
 		ref = NULL;
 		largo = 0;
 	}
-	SAComparatorN2(unsigned char *_ref, unsigned int _largo){
+	SAComparatorN2(unsigned char *_ref, unsigned long long _largo){
 		ref = _ref;
 		largo = _largo;
 	}
-	inline bool operator()(const unsigned int a, const unsigned int b){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
 		//return lexicographical_compare(&(ref[a])+2, &(ref[a])+(largo-a), &(ref[b])+2, &(ref[b])+(largo-b));
 		//En este caso debe verificarse si hay string nulos
 		if( a > largo-2 ){
@@ -106,20 +106,20 @@ public:
 };
 
 //Comparador para el tercer nivel de buckets (omite 3 caracter)
-class SAComparatorN3 : public std::binary_function<unsigned int, unsigned int, bool> {
+class SAComparatorN3 : public std::binary_function<unsigned long long, unsigned long long, bool> {
 private:
 	unsigned char *ref;
-	unsigned int largo;
+	unsigned long long largo;
 public:
 	SAComparatorN3(){
 		ref = NULL;
 		largo = 0;
 	}
-	SAComparatorN3(unsigned char *_ref, unsigned int _largo){
+	SAComparatorN3(unsigned char *_ref, unsigned long long _largo){
 		ref = _ref;
 		largo = _largo;
 	}
-	inline bool operator()(const unsigned int a, const unsigned int b){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
 		//return lexicographical_compare(&(ref[a])+2, &(ref[a])+(largo-a), &(ref[b])+2, &(ref[b])+(largo-b));
 		//En este caso debe verificarse si hay string nulos
 		if( a > largo-3 ){

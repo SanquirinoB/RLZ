@@ -24,17 +24,17 @@ private:
 	PositionsCoderBlocksBytes *pos_coder;
 	
 	//Buffers para almacenar el bloque actual descomprimido
-	unsigned int buff_size;
-	unsigned int *buff_pos;
-	unsigned int *buff_len;
-	unsigned int cur_block;
-	unsigned int cur_block_factores;
+	unsigned long long buff_size;
+	unsigned long long *buff_pos;
+	unsigned long long *buff_len;
+	unsigned long long cur_block;
+	unsigned long long cur_block_factores;
 	
-//	unsigned int n_blocks;
-//	unsigned int cur_block_ini;
-//	unsigned int block_size;
+//	unsigned long long n_blocks;
+//	unsigned long long cur_block_ini;
+//	unsigned long long block_size;
 	
-//	void decodeBlock(unsigned int block_pos);
+//	void decodeBlock(unsigned long long block_pos);
 	
 	//Borra headers, coders y resetea cur_block
 	//Conserva los buffers
@@ -44,7 +44,7 @@ private:
 	void deleteBuffers();
 	
 	//Resetea y extiende los buffers solo si new_size es mayor a buff_size
-	void prepareBuffer(unsigned int new_size);
+	void prepareBuffer(unsigned long long new_size);
 	
 public: 
 	//Notar que todo DecoderBlocksRelz usable DEBE construirse con un texto de referencia valido
@@ -56,13 +56,13 @@ public:
 	
 	//No verifica el tamaño del buffer, asume que el llamador conoce block_size
 	//Retorna el tamaño efectivo (block_size, o el resto en caso del ultimo bloque)
-	virtual unsigned int decodeBlock(unsigned int block, char *buffer);
+	virtual unsigned long long decodeBlock(unsigned long long block, char *buffer);
 	
-//	virtual unsigned int decodeBlockFactors(unsigned int block, unsigned int *buff_pos, unsigned int *buff_len);
+//	virtual unsigned long long decodeBlockFactors(unsigned long long block, unsigned long long *buff_pos, unsigned long long *buff_len);
 	
 	//Este metodo retorna un NUEVO objeto headers del tipo correcto
 	//Usa los argumentos en la creacion del header
-	virtual BlockHeaders *getNewHeaders(unsigned int _text_size, unsigned int _block_size, Metadata *_metadata = NULL);
+	virtual BlockHeaders *getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata = NULL);
 	
 };
 

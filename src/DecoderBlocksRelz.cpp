@@ -68,12 +68,12 @@ void DecoderBlocksRelz::deleteData(){
 	}
 }
 
-void DecoderBlocksRelz::prepareBuffer(unsigned int new_size){
+void DecoderBlocksRelz::prepareBuffer(unsigned long long new_size){
 	if(new_size > buff_size){
 		deleteBuffers();
 		buff_size = new_size;
-		buff_pos = new unsigned int[buff_size];
-		buff_len = new unsigned int[buff_size];
+		buff_pos = new unsigned long long[buff_size];
+		buff_len = new unsigned long long[buff_size];
 	}
 }
 
@@ -90,7 +90,7 @@ void DecoderBlocksRelz::load(const char *_master_file){
 		return;
 	}
 	
-	unsigned int byte_ini_data = headers->getDataPosition();
+	unsigned long long byte_ini_data = headers->getDataPosition();
 	cout<<"DecoderBlocksRelz::load - Cargando datos desde "<<byte_ini_data<<"\n";
 	
 	pos_coder = new PositionsCoderBlocks();
@@ -101,7 +101,7 @@ void DecoderBlocksRelz::load(const char *_master_file){
 	
 }
 
-unsigned int DecoderBlocksRelz::decodeBlock(unsigned int block, char *buff){
+unsigned long long DecoderBlocksRelz::decodeBlock(unsigned long long block, char *buff){
 //	cout<<"DecoderBlocksRelz::decodeBlock - Inicio ("<<block<<", n_blocks: "<<headers->getNumBlocks()<<")\n";
 	
 	if( headers == NULL || texto_ref == NULL || (block >= headers->getNumBlocks())){
@@ -148,7 +148,7 @@ unsigned int DecoderBlocksRelz::decodeBlock(unsigned int block, char *buff){
 			buff_len);
 		
 //		cout<<"DecoderBlocksRelz::decodeBlock - Revisando "<<cur_block_factores<<" factores\n";
-//		for(unsigned int i = 0; i < cur_block_factores; ++i){
+//		for(unsigned long long i = 0; i < cur_block_factores; ++i){
 //			cout<<"("<<buff_pos[i]<<", "<<buff_len[i]<<")\n";
 //		}
 		
@@ -157,8 +157,8 @@ unsigned int DecoderBlocksRelz::decodeBlock(unsigned int block, char *buff){
 	
 //	cout<<"DecoderBlocksRelz::decodeBlock - Extrayendo texto\n";
 	//extraer texto de los factores
-	unsigned int copied_chars = 0;
-	for(unsigned int i = 0; i < cur_block_factores; ++i){
+	unsigned long long copied_chars = 0;
+	for(unsigned long long i = 0; i < cur_block_factores; ++i){
 //		cout<<"DecoderBlocksRelz::decodeBlock - memcpy (buff["<<copied_chars<<"], texto_ref["<<buff_pos[i]<<"], "<<buff_len[i]<<")\n";
 		memcpy( buff + copied_chars, texto_ref + buff_pos[i], buff_len[i] );
 		copied_chars += buff_len[i];
@@ -171,7 +171,7 @@ unsigned int DecoderBlocksRelz::decodeBlock(unsigned int block, char *buff){
 	
 //Este metodo retorna un NUEVO objeto headers del tipo correcto
 //Usa los argumentos en la creacion del header
-BlockHeaders *DecoderBlocksRelz::getNewHeaders(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata){
+BlockHeaders *DecoderBlocksRelz::getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata){
 	return new BlockHeadersRelz(_text_size, _block_size, _metadata);
 }
 

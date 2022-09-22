@@ -28,11 +28,11 @@ protected:
 	PositionsCoderBlocks *pos_coder;
 	
 	//Buffers para almacenar el bloque actual descomprimido
-	unsigned int buff_size;
-	unsigned int *buff_pos;
-	unsigned int *buff_len;
-	unsigned int cur_block;
-	unsigned int cur_block_factores;
+	unsigned long long buff_size;
+	unsigned long long *buff_pos;
+	unsigned long long *buff_len;
+	unsigned long long cur_block;
+	unsigned long long cur_block_factores;
 	
 	//Borra headers, coders y resetea cur_block
 	//Conserva los buffers
@@ -42,7 +42,7 @@ protected:
 	void deleteBuffers();
 	
 	//Resetea y extiende los buffers solo si new_size es mayor a buff_size
-	void prepareBuffer(unsigned int new_size);
+	void prepareBuffer(unsigned long long new_size);
 	
 public: 
 	//Notar que todo DecoderBlocksRelz usable DEBE construirse con un texto de referencia valido
@@ -52,11 +52,11 @@ public:
 	
 	virtual void load(const char *_master_file);
 	
-	virtual unsigned int decodeBlock(unsigned int block_pos, char *buff);
+	virtual unsigned long long decodeBlock(unsigned long long block_pos, char *buff);
 	
 	//Este metodo retorna un NUEVO objeto headers del tipo correcto
 	//Usa los argumentos en la creacion del header
-	virtual BlockHeaders *getNewHeaders(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata = NULL);
+	virtual BlockHeaders *getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata = NULL);
 	
 	//Retorna un puntero a un nuevo Decoder del mismo tipo
 	//Adicionalmente podria copiar otros datos internos (pero el nuevo objeto debe ser independiente)
@@ -68,13 +68,13 @@ public:
 	
 	// Estos metodos son solo para acceder a los buffers para tomar estadisticos
 	
-	unsigned int *getBuffPos(){
+	unsigned long long *getBuffPos(){
 		return buff_pos; 
 	}
-	unsigned int *getBuffLen(){
+	unsigned long long *getBuffLen(){
 		return buff_len; 
 	}
-	unsigned int getNumFactors(){
+	unsigned long long getNumFactors(){
 		return cur_block_factores; 
 	}
 	

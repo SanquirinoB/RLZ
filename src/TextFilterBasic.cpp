@@ -17,7 +17,7 @@ bool TextFilterBasic::validChar(char c){
 
 // Almacena el alfabeto valido completo en alphabet (si es NULL lo omite)
 // Retorna el total de chars validos (incluso si alphabet == NULL)
-unsigned int TextFilterBasic::getAlphabet(vector<char> *alphabet){
+unsigned long long TextFilterBasic::getAlphabet(vector<char> *alphabet){
 	if(alphabet != NULL){
 		alphabet->push_back('A');
 		alphabet->push_back('C');

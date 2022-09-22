@@ -41,7 +41,7 @@ protected:
 	
 	// Compresion efectiva, separada para simplificar ligeramente el codigo
 	// Retorna true en exito, false en caso de fallo
-	bool realCompress(const char *in_file, unsigned int n_threads = 4, unsigned int block_size = 1000000, bool use_metadata = true, vector<pair<unsigned int, unsigned int> > *external_factors = NULL);
+	bool realCompress(const char *in_file, unsigned long long n_threads = 4, unsigned long long block_size = 1000000, bool use_metadata = true, vector<pair<unsigned long long, unsigned long long> > *external_factors = NULL);
 	
 public: 
 
@@ -67,23 +67,23 @@ public:
 		}
 		
 		//Datos del thread
-		unsigned int id;
+		unsigned long long id;
 		//Ojo con el largo del nombre de archivo
 		char file_headers[128];
 		char file_data[128];
 		
 		//Datos comunes (constantes)
-		unsigned int n_blocks;
-		unsigned int block_size;
+		unsigned long long n_blocks;
+		unsigned long long block_size;
 		
 		//Datos compartidos (punteros)
 		const CoderBlocks *coder;
-		unsigned int *shared_pos;
+		unsigned long long *shared_pos;
 		mutex *shared_mutex;
-		vector< pair<char*, unsigned int> > *lista_textos;
-		vector<unsigned int> *vector_bytes_headers;
-		vector<unsigned int> *vector_bytes_data;
-		vector<unsigned int> *vector_thread_block;
+		vector< pair<char*, unsigned long long> > *lista_textos;
+		vector<unsigned long long> *vector_bytes_headers;
+		vector<unsigned long long> *vector_bytes_data;
+		vector<unsigned long long> *vector_thread_block;
 		
 	};
 
@@ -105,28 +105,28 @@ public:
 	// Extrae texto comprimido
 	// Escribe length chars desde la posicion absoluta pos_ini en buff (asume al menos length + 1 chars de espacio)
 	// Retorna el largo del texto escrito (igual a strlen de buff)
-	virtual unsigned int read(unsigned long long pos_ini, unsigned int length, char *buff);
+	virtual unsigned long long read(unsigned long long pos_ini, unsigned long long length, char *buff);
 	
 	// Escribe texto recomprimiendo los bloques involucrados
 	// ESTO AUN NO ESTA TOTALMENTE IMPLEMENTADO
-	virtual unsigned int write(const char *text, unsigned int length, unsigned long long pos_ini);
+	virtual unsigned long long write(const char *text, unsigned long long length, unsigned long long pos_ini);
 	
 	// Descompresion completa del master_file asociado a este compressor
 	// Escribe el texto descomprimido en out_file (en lineas de un cierto largo)
 	// Eventualmente line_size sera removida
 	// Datos como eso de ser necesarios, estaran en los metadatos de BlockHeaders del Coder/Decoder
 	// Retorna true en exito, false en caso de fallo
-	virtual bool decompress(const char *out_file, unsigned int line_size = 70);
+	virtual bool decompress(const char *out_file, unsigned long long line_size = 70);
 	
 	// Compresion completa de un archivo de entrada in_file
 	// REEMPLAZANDO el master_file asociado a este compressor
 	// Retorna true en exito, false en caso de fallo
-	virtual bool compress(const char *in_file, unsigned int n_threads = 4, unsigned int block_size = 1000000, bool use_metadata = true, vector<pair<unsigned int, unsigned int> > *external_factors = NULL);
+	virtual bool compress(const char *in_file, unsigned long long n_threads = 4, unsigned long long block_size = 1000000, bool use_metadata = true, vector<pair<unsigned long long, unsigned long long> > *external_factors = NULL);
 	
 	// Compress only to produce the factors
 	// This method also returns the processed text and stores its length in text_length
 	// This because the method removes newlines and potentially other special characters
-	char * compressFactors(const char *in_file, unsigned int block_size, unsigned long long &text_length, vector<pair<unsigned int, unsigned int> > *external_factors);
+	char * compressFactors(const char *in_file, unsigned long long block_size, unsigned long long &text_length, vector<pair<unsigned long long, unsigned long long> > *external_factors);
 	
 	// Este metodo debe recargar al decoder y dejar al compresor en estado inicial
 	// Eso puede implicar resetear buffers y otras variables de estado

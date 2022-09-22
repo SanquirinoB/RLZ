@@ -15,7 +15,7 @@ bool TextFilter::validChar(char c){
 
 // Almacena el alfabeto valido completo en alphabet (si es NULL lo omite)
 // Retorna el total de chars validos (incluso si alphabet == NULL)
-unsigned int TextFilter::getAlphabet(vector<char> *alphabet){
+unsigned long long TextFilter::getAlphabet(vector<char> *alphabet){
 	cerr<<"TextFilter::getAlphabet - No Implementado\n";
 	return 0;
 }
@@ -45,7 +45,7 @@ char *TextFilter::readText(const char *in_file, unsigned long long &text_length,
 	
 	text[0] = 0;
 	text_length = 0;
-	unsigned int max_read = 64*1024;
+	unsigned long long max_read = 64*1024;
 	char *buff = new char[max_read];
 	unsigned long long total_read = 0;
 	
@@ -55,9 +55,9 @@ char *TextFilter::readText(const char *in_file, unsigned long long &text_length,
 	
 	while( (total_read < file_size) && lector.good() ){
 		lector.read(buff, max_read);
-		unsigned int lectura = lector.gcount();
+		unsigned long long lectura = lector.gcount();
 		total_read += lectura;
-		for(unsigned int j = 0; j < lectura; ++j){
+		for(unsigned long long j = 0; j < lectura; ++j){
 			// Omito chars invalidos y luego construyo lowcase run
 			// De este modo, la verificacion de up/low case es independiente del filtrado
 			char c = buff[j];
@@ -122,12 +122,12 @@ char *TextFilter::readText(const char *in_file, unsigned long long &text_length,
 	
 }
 
-unsigned int TextFilter::readReference(const char *in_file, char *text){
+unsigned long long TextFilter::readReference(const char *in_file, char *text){
 
 	cout<<"TextFilter::readReference - Inicio (leyendo \""<<in_file<<"\")\n";
 	
 	text[0] = 0;
-	unsigned int text_length = 0;
+	unsigned long long text_length = 0;
 	NanoTimer timer;
 	fstream lector(in_file, fstream::in);
 	if(! lector.good() ){
@@ -136,18 +136,18 @@ unsigned int TextFilter::readReference(const char *in_file, char *text){
 	}
 	//Tomo el largo para cargarlo completo
 	lector.seekg (0, lector.end);
-	unsigned int file_size = lector.tellg();
+	unsigned long long file_size = lector.tellg();
 	lector.seekg (0, lector.beg);
 	
-	unsigned int max_read = 64*1024;
+	unsigned long long max_read = 64*1024;
 	char *buff = new char[max_read];
-	unsigned int total_read = 0;
+	unsigned long long total_read = 0;
 	
 	while( (total_read < file_size) && lector.good() ){
 		lector.read(buff, max_read);
-		unsigned int lectura = lector.gcount();
+		unsigned long long lectura = lector.gcount();
 		total_read += lectura;
-		for(unsigned int j = 0; j < lectura; ++j){
+		for(unsigned long long j = 0; j < lectura; ++j){
 			char c = toupper(buff[j]);
 			if( c == 'A' || c == 'C' || c == 'G' || c == 'T'){
 				text[text_length++] = c;
@@ -164,12 +164,12 @@ unsigned int TextFilter::readReference(const char *in_file, char *text){
 	
 }
 
-unsigned int TextFilter::readReferenceFull(const char *in_file, char *text){
+unsigned long long TextFilter::readReferenceFull(const char *in_file, char *text){
 
 	cout<<"TextFilter::readReferenceFull - Inicio (leyendo \""<<in_file<<"\")\n";
 	
 	text[0] = 0;
-	unsigned int text_length = 0;
+	unsigned long long text_length = 0;
 	NanoTimer timer;
 	fstream lector(in_file, fstream::in);
 	if(! lector.good() ){
@@ -178,18 +178,18 @@ unsigned int TextFilter::readReferenceFull(const char *in_file, char *text){
 	}
 	//Tomo el largo para cargarlo completo
 	lector.seekg (0, lector.end);
-	unsigned int file_size = lector.tellg();
+	unsigned long long file_size = lector.tellg();
 	lector.seekg (0, lector.beg);
 	
-	unsigned int max_read = 64*1024;
+	unsigned long long max_read = 64*1024;
 	char *buff = new char[max_read];
-	unsigned int total_read = 0;
+	unsigned long long total_read = 0;
 	
 	while( (total_read < file_size) && lector.good() ){
 		lector.read(buff, max_read);
-		unsigned int lectura = lector.gcount();
+		unsigned long long lectura = lector.gcount();
 		total_read += lectura;
-		for(unsigned int j = 0; j < lectura; ++j){
+		for(unsigned long long j = 0; j < lectura; ++j){
 			char c = toupper(buff[j]);
 			if( (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ){
 				text[text_length++] = c;
@@ -240,7 +240,7 @@ unsigned long long TextFilter::filterNewLines(char *text, unsigned long long tex
 	//  Se puede resolver esto con una estructura de rank/select ?
 	//  Por ahora lo dejo en version descomprimida y directa, pero notando eso.
 	
-	unsigned int mov = 0;
+	unsigned long long mov = 0;
 	for(unsigned long long i = 0; i < text_length; ++i){
 		if( text[i] == '\n' ){
 			// NL encontrado, agregar pos absoluta

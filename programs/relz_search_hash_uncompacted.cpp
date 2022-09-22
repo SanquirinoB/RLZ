@@ -44,10 +44,10 @@ int main(int argc, char* argv[]){
 	
 	cout << "----- Testing load -----\n";
 	NanoTimer timer;
-	vector<unsigned int> results;
-	unsigned int bits = 8;
-//	unsigned int mod = 787;
-	unsigned int mod = 15485863;
+	vector<unsigned long long> results;
+	unsigned long long bits = 8;
+//	unsigned long long mod = 787;
+	unsigned long long mod = 15485863;
 //	KarpRabin karp_rabin(bits, mod, 1100000000);
 	KarpRabin karp_rabin(bits, mod, 10000000);
 	RelzIndexHashUncompacted index;
@@ -56,12 +56,12 @@ int main(int argc, char* argv[]){
 	
 	cout << "----- Loading Queries from \"" << queries_file << "\" -----\n";
 	vector<string> queries;
-	unsigned int max_line = 1000000;
+	unsigned long long max_line = 1000000;
 	char buff[max_line + 1];
 	fstream reader(queries_file, fstream::in);
 	while( reader.good() ){
 		reader.getline(buff, max_line);
-		unsigned int n_read = reader.gcount();
+		unsigned long long n_read = reader.gcount();
 		if( n_read < 1 ){
 			continue;
 		}

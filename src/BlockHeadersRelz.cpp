@@ -5,7 +5,7 @@ BlockHeadersRelz::BlockHeadersRelz()
 {
 }
 
-BlockHeadersRelz::BlockHeadersRelz(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata)
+BlockHeadersRelz::BlockHeadersRelz(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata)
  : BlockHeaders(_text_size, _block_size, _metadata)
 {
 }
@@ -15,7 +15,7 @@ BlockHeadersRelz::~BlockHeadersRelz(){
 }
 
 void BlockHeadersRelz::clearHeaders(){
-	for(unsigned int i = 0; i < headers.size(); ++i){
+	for(unsigned long long i = 0; i < headers.size(); ++i){
 		if(headers[i] != NULL){
 			delete headers[i];
 		}
@@ -33,7 +33,7 @@ void BlockHeadersRelz::addBlock(Header *header){
 	headers.push_back( header_relz );
 }
 
-void BlockHeadersRelz::loadBlock(fstream *reader, unsigned int bytes){
+void BlockHeadersRelz::loadBlock(fstream *reader, unsigned long long bytes){
 	if( reader == NULL || (! reader->good()) ){
 		cerr<<"BlockHeadersRelz::loadHeader - Error in reader\n";
 		return;
@@ -44,21 +44,21 @@ void BlockHeadersRelz::loadBlock(fstream *reader, unsigned int bytes){
 	headers.push_back( header );
 }
 
-void BlockHeadersRelz::reloadBlock(fstream *reader, unsigned int bytes, unsigned int pos){
+void BlockHeadersRelz::reloadBlock(fstream *reader, unsigned long long bytes, unsigned long long pos){
 	if( reader == NULL || (! reader->good()) ){
 		cerr<<"BlockHeadersRelz::reloadBlock - Error in reader\n";
 		return;
 	}
 	// Simplemente creo nuevos bloques vacios mientras sea necesario
 	// Asi, al final es seguro simplemente recargarlo
-	for(unsigned int i = headers.size(); i <= pos; ++i){
+	for(unsigned long long i = headers.size(); i <= pos; ++i){
 		headers.push_back( new HeaderRelz() );
 	}
 	headers[pos]->load( reader );
 }
 
-unsigned int BlockHeadersRelz::save(fstream *writer){
-	unsigned int size = headers.size();
+unsigned long long BlockHeadersRelz::save(fstream *writer){
+	unsigned long long size = headers.size();
 	
 	cout<<"BlockHeadersRelz::save - Saving "<<size<<" blocks (block_size: "<<block_size<<")\n";
 	
@@ -86,8 +86,8 @@ unsigned int BlockHeadersRelz::save(fstream *writer){
 //	cout<<"BlockHeadersRelz::save - Metadata saved, writing blocks\n";
 	
 	//Headers
-	unsigned int n_factores, bytes_pos, bytes_len;
-	for(unsigned int i = 0; i < size; ++i){
+	unsigned long long n_factores, bytes_pos, bytes_len;
+	for(unsigned long long i = 0; i < size; ++i){
 //		cout<<"BlockHeadersRelz::save - Writing Meta-Block "<<i<<" / "<<size<<"\n";
 		n_factores = headers[i]->n_factores;
 		bytes_pos = headers[i]->bytes_pos;
@@ -113,7 +113,7 @@ void BlockHeadersRelz::load(fstream *reader){
 	}
 	
 	//Metadatos
-	unsigned int size = 0;
+	unsigned long long size = 0;
 	text_size = 0;
 	block_size = 0;
 	reader->read((char*)(&size), sizeof(int));
@@ -132,8 +132,8 @@ void BlockHeadersRelz::load(fstream *reader){
 	//Headers
 	clearHeaders();
 	HeaderRelz *header = NULL;
-	unsigned int n_factores, bytes_pos, bytes_len;
-	for(unsigned int i = 0; i < size; ++i){
+	unsigned long long n_factores, bytes_pos, bytes_len;
+	for(unsigned long long i = 0; i < size; ++i){
 		reader->read((char*)(&n_factores), sizeof(int));
 		reader->read((char*)(&bytes_pos), sizeof(int));
 		reader->read((char*)(&bytes_len), sizeof(int));
@@ -153,7 +153,7 @@ void BlockHeadersRelz::load(BytesReader *reader){
 	}
 	
 	//Metadatos
-	unsigned int size = 0;
+	unsigned long long size = 0;
 	text_size = 0;
 	block_size = 0;
 	reader->read((char*)(&size), sizeof(int));
@@ -172,8 +172,8 @@ void BlockHeadersRelz::load(BytesReader *reader){
 	//Headers
 	clearHeaders();
 	HeaderRelz *header = NULL;
-	unsigned int n_factores, bytes_pos, bytes_len;
-	for(unsigned int i = 0; i < size; ++i){
+	unsigned long long n_factores, bytes_pos, bytes_len;
+	for(unsigned long long i = 0; i < size; ++i){
 		reader->read((char*)(&n_factores), sizeof(int));
 		reader->read((char*)(&bytes_pos), sizeof(int));
 		reader->read((char*)(&bytes_len), sizeof(int));
@@ -183,10 +183,10 @@ void BlockHeadersRelz::load(BytesReader *reader){
 	
 }
 
-//void BlockHeadersRelz::loadBytes(char *bytes, unsigned int byte_ini){
+//void BlockHeadersRelz::loadBytes(char *bytes, unsigned long long byte_ini){
 //}
 
-unsigned int BlockHeadersRelz::getNumBlocks(){
+unsigned long long BlockHeadersRelz::getNumBlocks(){
 	//Resta el bloque ficticio final
 	if( headers.size() == 0 ){
 		return 0;
@@ -195,11 +195,11 @@ unsigned int BlockHeadersRelz::getNumBlocks(){
 }
 
 void BlockHeadersRelz::prepare(){
-	unsigned int bytes_pos = 0;
-	unsigned int bytes_len = 0;
+	unsigned long long bytes_pos = 0;
+	unsigned long long bytes_len = 0;
 	// El total es un valor guardado del ultimo unprepare, o 0 (inicialmente)
-	unsigned int bytes_total = bytes_total_initial;
-	for(unsigned int i = unprepared_block; i < headers.size(); ++i){
+	unsigned long long bytes_total = bytes_total_initial;
+	for(unsigned long long i = unprepared_block; i < headers.size(); ++i){
 		bytes_pos = headers[i]->bytes_pos;
 		bytes_len = headers[i]->bytes_len;
 		headers[i]->bytes_pos = bytes_total;
@@ -225,7 +225,7 @@ void BlockHeadersRelz::prepare(){
 	cout<<"BlockHeadersRelz::prepare - data_pos: "<<data_pos<<" (type: "<<BlockHeadersFactory::typeSize()<<", meta: "<<(4 * sizeof(int) + metadata->size())<<", headers: "<<(headers.size() * 3 * sizeof(int))<<")\n";
 }
 
-void BlockHeadersRelz::unprepare(unsigned int block_ini){
+void BlockHeadersRelz::unprepare(unsigned long long block_ini){
 	if( block_ini >= headers.size()-1 ){
 		cerr<<"BlockHeadersRelz::unprepare - Warning, invalid block_ini ("<<block_ini<<" of "<<headers.size()<<")\n";
 		return;
@@ -236,11 +236,11 @@ void BlockHeadersRelz::unprepare(unsigned int block_ini){
 	}
 	unprepared_block = block_ini;
 	bytes_total_initial = headers[block_ini]->bytes_pos;
-	unsigned int bytes_pos = 0;
-	unsigned int bytes_len = 0;
+	unsigned long long bytes_pos = 0;
+	unsigned long long bytes_len = 0;
 	// Notar que omito el ultimo bloque para restar en forma segura
 	// Esto asume que el ultimo bloque es ficticio
-	for(unsigned int i = block_ini; i < headers.size() - 1; ++i){
+	for(unsigned long long i = block_ini; i < headers.size() - 1; ++i){
 		bytes_pos = headers[i]->bytes_len - headers[i]->bytes_pos;
 		bytes_len = headers[i+1]->bytes_pos - headers[i]->bytes_len;
 		headers[i]->bytes_pos = bytes_pos;
@@ -249,14 +249,14 @@ void BlockHeadersRelz::unprepare(unsigned int block_ini){
 	headers.pop_back();
 }
 
-unsigned int BlockHeadersRelz::getBlockPosition(unsigned int block){
+unsigned long long BlockHeadersRelz::getBlockPosition(unsigned long long block){
 	if( block >= headers.size() ){
 		return 0;
 	}
 	return headers[block]->bytes_pos;
 }
 
-unsigned int BlockHeadersRelz::getFactors(unsigned int block){
+unsigned long long BlockHeadersRelz::getFactors(unsigned long long block){
 	if(block >= headers.size()){
 		return 0;
 	}
@@ -264,14 +264,14 @@ unsigned int BlockHeadersRelz::getFactors(unsigned int block){
 	return headers[block]->n_factores;
 }
 
-unsigned int BlockHeadersRelz::getBytesPos(unsigned int block){
+unsigned long long BlockHeadersRelz::getBytesPos(unsigned long long block){
 	if(block >= headers.size()){
 		return 0;
 	}
 	return headers[block]->bytes_pos;
 }
 
-unsigned int BlockHeadersRelz::getBytesLen(unsigned int block){
+unsigned long long BlockHeadersRelz::getBytesLen(unsigned long long block){
 	if(block >= headers.size()){
 		return 0;
 	}

@@ -1,15 +1,15 @@
 #include "ReferenceIndexBasic.h"
 	
 //funcion (global por el momento) para threads
-void f_sort(unsigned int id, unsigned int **shared_arrs, unsigned int *n_largos, unsigned int n_arrs, mutex *shared_mutex, unsigned int *shared_pos, SAComparatorN3 *shared_comp){
+void f_sort(unsigned long long id, unsigned long long **shared_arrs, unsigned long long *n_largos, unsigned long long n_arrs, mutex *shared_mutex, unsigned long long *shared_pos, SAComparatorN3 *shared_comp){
 	
 //	shared_mutex->lock();
 //	cout<<"Thread ["<<id<<"] - Inicio\n";
 //	shared_mutex->unlock();
 	
 	NanoTimer timer;
-	unsigned int pos_local = 0;
-	unsigned int partes_procesadas = 0;
+	unsigned long long pos_local = 0;
+	unsigned long long partes_procesadas = 0;
 	while(true){
 		shared_mutex->lock();
 		pos_local = *shared_pos;
@@ -46,12 +46,12 @@ ReferenceIndexBasic::ReferenceIndexBasic(){
 	largo = 0;
 }
 	
-ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n_threads){
+ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned long long n_threads){
 	
 	cout<<"ReferenceIndexBasic - inicio\n";
 	
 	largo = strlen(_referencia);
-	arr = new unsigned int[largo];
+	arr = new unsigned long long[largo];
 	
 	ref = new unsigned char[largo + 1];
 	memset(ref, 0, largo + 1);
@@ -59,9 +59,9 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 	
 //	cout<<"ReferenceIndexBasic - Texto: \""<<(char*)ref<<"\" (" << strlen((char*)ref) << ")\n";
 	
-	for(unsigned int i = 0; i < largo; ++i){
+	for(unsigned long long i = 0; i < largo; ++i){
 		arr[i] = i;
-//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned int)(ref[ arr[i]])<<")\n";
+//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned long long)(ref[ arr[i]])<<")\n";
 	}
 	cout<<"ReferenceIndexBasic - arr de largo "<<largo<<"\n";
 	
@@ -70,11 +70,11 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 	
 	cout<<"ReferenceIndexBasic - preparando datos\n";
 	
-	unsigned int ***index = new unsigned int**[256];
-	for(unsigned int i = 0; i < 256; ++i){
-		index[i] = new unsigned int*[256];
-		for(unsigned int j = 0; j < 256; ++j){
-			index[i][j] = new unsigned int[256];
+	unsigned long long ***index = new unsigned long long**[256];
+	for(unsigned long long i = 0; i < 256; ++i){
+		index[i] = new unsigned long long*[256];
+		for(unsigned long long j = 0; j < 256; ++j){
+			index[i][j] = new unsigned long long[256];
 			memset(index[i][j], 0, 256*sizeof(int));
 		}
 	}
@@ -87,24 +87,24 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 
 	set<unsigned char> voc_usado;
 	set<unsigned char>::iterator it_voc;
-	for(unsigned int i = 0; i < largo; ++i){
+	for(unsigned long long i = 0; i < largo; ++i){
 		voc_usado.insert(ref[i]);
 	}
 	vector<unsigned char> vocabulary;
 	for(it_voc = voc_usado.begin(); it_voc != voc_usado.end(); it_voc++){
 		if(*it_voc != 0){
-//			cout<<"ReferenceIndexBasic - Agregando \'"<<(*it_voc)<<"\' ("<<(unsigned int)(*it_voc)<<")\n";
+//			cout<<"ReferenceIndexBasic - Agregando \'"<<(*it_voc)<<"\' ("<<(unsigned long long)(*it_voc)<<")\n";
 			vocabulary.push_back(*it_voc);
 		}
 	}
 	
 	cout<<"ReferenceIndexBasic - preparando buckets\n";
 	
-	unsigned int n_buckets = vocabulary.size() * vocabulary.size() * vocabulary.size();
-	unsigned int contador = 0;
-	for(unsigned int i = 0; i < vocabulary.size(); ++i){
-		for(unsigned int j = 0; j < vocabulary.size(); ++j){
-			for(unsigned int k = 0; k < vocabulary.size(); ++k){
+	unsigned long long n_buckets = vocabulary.size() * vocabulary.size() * vocabulary.size();
+	unsigned long long contador = 0;
+	for(unsigned long long i = 0; i < vocabulary.size(); ++i){
+		for(unsigned long long j = 0; j < vocabulary.size(); ++j){
+			for(unsigned long long k = 0; k < vocabulary.size(); ++k){
 //				cout<<"{"<<vocabulary[i]<<", "<<vocabulary[j]<<", "<<vocabulary[k]<<"} : "<<contador<<"\n";
 				index[ vocabulary[i] ][ vocabulary[j] ][ vocabulary[k] ] = contador++;
 			}
@@ -112,7 +112,7 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 	}
 	
 	cout<<"ReferenceIndexBasic - contando ("<<n_buckets<<" buckets)\n";
-	unsigned int *n = new unsigned int[n_buckets];
+	unsigned long long *n = new unsigned long long[n_buckets];
 	memset(n, 0, n_buckets * sizeof(int));
 	
 	//Casos de Borde
@@ -120,24 +120,24 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 	//ref[largo-1]['A'], la primera letra del vocabulario
 	++(n[ index[ ref[largo-2] ][ ref[largo-1] ][ vocabulary[0] ] ]);
 	++(n[ index[ ref[largo-1] ][ vocabulary[0] ][ vocabulary[0] ] ]);
-	for(unsigned int i = 0; i < largo-2; ++i){
+	for(unsigned long long i = 0; i < largo-2; ++i){
 //		cout<<" n["<<ref[i]<<"]["<<ref[i+1]<<"]["<<ref[i+2]<<"]++ ("<<index[ref[i]][ref[i+1]][ref[i+2]]<<")\n";
 		++(n[ index[ref[i]][ref[i+1]][ref[i+2]] ]);
 	}
 	
 	cout<<"ReferenceIndexBasic - creando buckets\n";
-	unsigned int **bucket = new unsigned int *[n_buckets];
-	for(unsigned int i = 0; i < n_buckets; ++i){
+	unsigned long long **bucket = new unsigned long long *[n_buckets];
+	for(unsigned long long i = 0; i < n_buckets; ++i){
 		if( n[i] > 0){
 			
 //			//Convierto posicion en tripleta que lo genero para confirmar resultados
-//			unsigned int p1 = i / (vocabulary.size() * vocabulary.size());
-//			unsigned int imod = i % (vocabulary.size() * vocabulary.size());
-//			unsigned int p2 = imod / vocabulary.size();
-//			unsigned int p3 = imod % vocabulary.size();
+//			unsigned long long p1 = i / (vocabulary.size() * vocabulary.size());
+//			unsigned long long imod = i % (vocabulary.size() * vocabulary.size());
+//			unsigned long long p2 = imod / vocabulary.size();
+//			unsigned long long p3 = imod % vocabulary.size();
 //			cout<<"Bucket ["<<i<<"]: "<<n[i]<<" elements (["<<vocabulary[p1]<<"]["<<vocabulary[p2]<<"]["<<vocabulary[p3]<<"])\n";
 			
-			bucket[i] = new unsigned int[n[i]];
+			bucket[i] = new unsigned long long[n[i]];
 		}
 		else{
 			bucket[i] = NULL;
@@ -145,51 +145,51 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 	}
 	
 	cout<<"ReferenceIndexBasic - llenando buckets\n";
-	unsigned int *pos = new unsigned int[n_buckets];
+	unsigned long long *pos = new unsigned long long[n_buckets];
 	memset(pos, 0, n_buckets * sizeof(int));
 	
 	//Agrego el ultimo sufijo como el primero de su bucket, mismo caso de borde anterior
 	bucket[ index[ ref[largo-2] ][ ref[largo-1] ][ vocabulary[0] ] ][ pos[ index[ ref[largo-2] ][ ref[largo-1] ][ vocabulary[0] ] ]++ ] = largo-2;
 	bucket[ index[ ref[largo-1] ][ vocabulary[0] ][ vocabulary[0] ] ][ pos[ index[ ref[largo-1] ][ vocabulary[0] ][ vocabulary[0] ] ]++ ] = largo-1;
-	for(unsigned int i = 0; i < largo-2; ++i){
+	for(unsigned long long i = 0; i < largo-2; ++i){
 		bucket[ index[ref[i]][ref[i+1]][ref[i+2]] ][ pos[ index[ref[i]][ref[i+1]][ref[i+2]] ]++ ] = i;
 	}
 	
 	cout<<"ReferenceIndexBasic - Ordenando buckets\n";
-	SAComparatorN3 comp(ref, (unsigned int)largo);
+	SAComparatorN3 comp(ref, (unsigned long long)largo);
 
 	//Version Secuencial
-//	for(unsigned int i = 0; i < n_buckets; ++i){
+//	for(unsigned long long i = 0; i < n_buckets; ++i){
 //		sort(bucket[i], bucket[i]+pos[i], comp);
 //	}
 	
 	//Version paralela
 	vector<std::thread> sort_threads;
 	mutex shared_mutex;
-	unsigned int shared_pos = 0;
+	unsigned long long shared_pos = 0;
 	
-	for(unsigned int i = 0; i < n_threads; ++i){
+	for(unsigned long long i = 0; i < n_threads; ++i){
 		sort_threads.push_back( std::thread(f_sort, i, bucket, pos, n_buckets, &shared_mutex, &shared_pos, &comp) );
 	}
-	for(unsigned int i = 0; i < n_threads; ++i){
+	for(unsigned long long i = 0; i < n_threads; ++i){
 		sort_threads[i].join();
 	}
 	
 	//Copia de resultados al arreglo final
 	//Notar que esto SE PUEDE hacer en los threads
 	//Solo lo dejo asi por legibilidad
-	unsigned int pos_arr = 0;
-	for(unsigned int i = 0; i < n_buckets; ++i){
-		for(unsigned int j = 0; j < pos[i]; ++j){
+	unsigned long long pos_arr = 0;
+	for(unsigned long long i = 0; i < n_buckets; ++i){
+		for(unsigned long long j = 0; j < pos[i]; ++j){
 			arr[pos_arr++] = bucket[i][j];
 		}
 	}
 	
 	//Borrado
 	if( index != NULL ){
-		for(unsigned int i = 0; i < 256; ++i){
+		for(unsigned long long i = 0; i < 256; ++i){
 			if(index[i] != NULL){
-				for(unsigned int j = 0; j < 256; ++j){
+				for(unsigned long long j = 0; j < 256; ++j){
 					if( index[i][j] != NULL ){
 						delete [] index[i][j];
 					}
@@ -200,7 +200,7 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 		delete [] index;
 	}
 	if( bucket != NULL ){
-		for(unsigned int i = 0; i < n_buckets; ++i){
+		for(unsigned long long i = 0; i < n_buckets; ++i){
 			if( bucket[i] != NULL){
 				delete [] bucket[i];
 			}
@@ -214,8 +214,8 @@ ReferenceIndexBasic::ReferenceIndexBasic(const char *_referencia, unsigned int n
 		delete [] n;
 	}
 	
-//	for(unsigned int i = 0; i < largo; ++i){
-//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned int)(ref[ arr[i]])<<")\n";
+//	for(unsigned long long i = 0; i < largo; ++i){
+//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned long long)(ref[ arr[i]])<<")\n";
 //	}
 	
 	cout<<"ReferenceIndexBasic - fin\n";
@@ -234,7 +234,7 @@ ReferenceIndexBasic::~ReferenceIndexBasic(){
 
 //Busca el "text" en el arreglo de sufijos
 //Guarda la posicio y el largo del mayor prefijo comun
-void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const{
+void ReferenceIndexBasic::find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const{
 	position = 0;
 	length = 0;
 	
@@ -243,18 +243,18 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 	//Notar que es trivial preparar limites ajustados para, por ejemplo, las primeras 2 letras de la query
 	//Eso seria equivalente a evitar las 2 primeras iteraciones del for (las mas largas, obviamente)
 	
-	unsigned int limite_izq = 0;
-	unsigned int limite_der = largo-1;
-	unsigned int utimo_comun = 0xffffffff;
+	unsigned long long limite_izq = 0;
+	unsigned long long limite_der = largo-1;
+	unsigned long long utimo_comun = 0xffffffff;
 	
-	for(unsigned int cur_pos = 0; cur_pos < size; ++cur_pos){
+	for(unsigned long long cur_pos = 0; cur_pos < size; ++cur_pos){
 //		cout<<"ReferenceIndexBasic::find - cur_pos: "<<cur_pos<<" ("<<limite_izq<<", "<<limite_der<<")\n";
 		//se busca el caracter text[cur_pos] en la posicion cur_pos de los sufijos
 		
 		//buscar limite izq
 
 //		//version lineal
-//		unsigned int izq = limite_izq;
+//		unsigned long long izq = limite_izq;
 //		while( (izq < largo) && (
 //			arr[izq] + cur_pos >= largo || 
 //			*(ref + arr[izq] + cur_pos) < text[cur_pos]
@@ -263,9 +263,9 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 //		}
 
 		//Version binaria
-		unsigned int l = limite_izq;
-		unsigned int h = limite_der;
-		unsigned int m;
+		unsigned long long l = limite_izq;
+		unsigned long long h = limite_der;
+		unsigned long long m;
 		while(l < h){
 			m = l + ((h-l)>>1);
 			if( arr[m] + cur_pos > largo || *(ref + arr[m] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -275,7 +275,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 				h = m;
 			}
 		}
-		unsigned int izq = h;
+		unsigned long long izq = h;
 		// Ajuste adicional (esto es porque h no puede ser mayor a limite_der para romper igualdad)
 		if( (arr[izq] + cur_pos < largo) 
 			&& *(ref + arr[izq] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -287,7 +287,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 		//buscar limite der
 		
 //		//version lineal
-//		unsigned int der = limite_der;
+//		unsigned long long der = limite_der;
 //		while( (der > 0) && (arr[der] + cur_pos < largo) &&
 //			*(ref + arr[der] + cur_pos) > text[cur_pos] 
 //			){
@@ -306,7 +306,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 				h = m;
 			}
 		}
-		unsigned int der = h;
+		unsigned long long der = h;
 		if( (der > 0) && (arr[der] + cur_pos < largo) 
 			&& *(ref + arr[der] + cur_pos) > (unsigned char)(*(text + cur_pos)) ){
 			--der;
@@ -354,7 +354,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 // Tambien considera un cierto min_length para considerar las busquedas validas
 // Si no encuentra un sufijo comun de largo min_length o mas, omite el resultado
 // Mientras busca el sufijo, comienza a probar el rango valido solo si ya tiene min_length o mas encontrado
-void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int &position, unsigned int &length, unsigned int min_length, bool *arr_valid) const{
+void ReferenceIndexBasic::find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length, unsigned long long min_length, bool *arr_valid) const{
 	
 	position = 0;
 	length = 0;
@@ -363,7 +363,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 //	cout<<"ReferenceIndexBasic::find - inicio (largo "<<size<<", min_length: "<<min_length<<")\n";
 	
 //	cout<<"ReferenceIndexBasic::find - arr_valid: ";
-//	for(unsigned int i = 0; i < largo; ++i){
+//	for(unsigned long long i = 0; i < largo; ++i){
 //		if( arr_valid[i] ){
 //			cout<<"1";
 //		}
@@ -376,18 +376,18 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 	//Notar que es trivial preparar limites ajustados para, por ejemplo, las primeras 2 letras de la query
 	//Eso seria equivalente a evitar las 2 primeras iteraciones del for (las mas largas, obviamente)
 	
-	unsigned int limite_izq = 0;
-	unsigned int limite_der = largo-1;
-	unsigned int utimo_comun = 0xffffffff;
+	unsigned long long limite_izq = 0;
+	unsigned long long limite_der = largo-1;
+	unsigned long long utimo_comun = 0xffffffff;
 	
-	for(unsigned int cur_pos = 0; cur_pos < size; ++cur_pos){
+	for(unsigned long long cur_pos = 0; cur_pos < size; ++cur_pos){
 //		cout<<"ReferenceIndexBasic::find - cur_pos: "<<cur_pos<<" ("<<limite_izq<<", "<<limite_der<<"), utimo_comun: "<<utimo_comun<<"\n";
 		//se busca el caracter text[cur_pos] en la posicion cur_pos de los sufijos
 		
 		//buscar limite izq
 
 //		//version lineal
-//		unsigned int izq = limite_izq;
+//		unsigned long long izq = limite_izq;
 //		while( (izq < largo) && (
 //			arr[izq] + cur_pos > largo || 
 //			*(ref + arr[izq] + cur_pos) < text[cur_pos]
@@ -396,9 +396,9 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 //		}
 
 		//Version binaria
-		unsigned int l = limite_izq;
-		unsigned int h = limite_der;
-		unsigned int m;
+		unsigned long long l = limite_izq;
+		unsigned long long h = limite_der;
+		unsigned long long m;
 		while(l < h){
 			m = l + ((h-l)>>1);
 			if( arr[m] + cur_pos > largo || *(ref + arr[m] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -408,7 +408,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 				h = m;
 			}
 		}
-		unsigned int izq = h;
+		unsigned long long izq = h;
 		// Ajuste adicional (esto es porque h no puede ser mayor a limite_der para romper igualdad)
 		if( (arr[izq] + cur_pos < largo) 
 			&& *(ref + arr[izq] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -420,7 +420,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 		//buscar limite der
 		
 //		//version lineal
-//		unsigned int der = limite_der;
+//		unsigned long long der = limite_der;
 //		while( (der > 0) && (arr[der] + cur_pos < largo) &&
 //			*(ref + arr[der] + cur_pos) > text[cur_pos] 
 //			){
@@ -439,7 +439,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 				h = m;
 			}
 		}
-		unsigned int der = h;
+		unsigned long long der = h;
 		if( (der > 0) && (arr[der] + cur_pos < largo) 
 			&& *(ref + arr[der] + cur_pos) > (unsigned char)(*(text + cur_pos)) ){
 			--der;
@@ -452,7 +452,7 @@ void ReferenceIndexBasic::find(const char *text, unsigned int size, unsigned int
 //			cout<<"ReferenceIndexBasic::find - verificando range\n";
 			//Basta con que haya alguna posicion valida para seguir (solo paro si no quedan)
 			bool valid = false;
-			for(unsigned int i = izq; i <= der; ++i){
+			for(unsigned long long i = izq; i <= der; ++i){
 				//(arr[i] + cur_pos) debe estar en rango valido
 				if( arr_valid[ (arr[i] + cur_pos) ] ){
 					valid = true;
@@ -540,15 +540,15 @@ void ReferenceIndexBasic::load(const char *ref_file){
 	ref = new unsigned char[largo + 1];
 	lector.read((char*)ref, largo);
 	ref[largo] = 0;
-	arr = new unsigned int[largo];
+	arr = new unsigned long long[largo];
 	
 //	cout<<"ReferenceIndexBasic::load - Texto: \""<<(char*)ref<<"\"\n";
 	
 	lector.read((char*)arr, largo * sizeof(int));
 	lector.close();
 	
-//	for(unsigned int i = 0; i < largo; ++i){
-//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned int)(ref[ arr[i]])<<")\n";
+//	for(unsigned long long i = 0; i < largo; ++i){
+//		cout<<"arr["<<i<<"]: "<<arr[i]<<" (\""<<&(ref[ arr[i] ])<<"\", largo "<<largo-arr[i]<<", char[0]: "<<(unsigned long long)(ref[ arr[i]])<<")\n";
 //	}
 	
 //	cout<<"ReferenceIndexBasic::load - Carga Terminada\n";
@@ -558,7 +558,7 @@ void ReferenceIndexBasic::load(const char *ref_file){
 // Notar que este metodo es static
 char *ReferenceIndexBasic::loadText(const char *ref_file){
 	char *text = NULL;
-	unsigned int text_size = 0;
+	unsigned long long text_size = 0;
 	
 	fstream reader(ref_file, fstream::binary | fstream::in);
 	if( ! reader.good() ){
@@ -578,21 +578,21 @@ char *ReferenceIndexBasic::loadText(const char *ref_file){
 	return text;
 }
 
-void ReferenceIndexBasic::search(const char *text, unsigned int size, vector<unsigned int> &res) const{
+void ReferenceIndexBasic::search(const char *text, unsigned long long size, vector<unsigned long long> &res) const{
 
 	cout<<"ReferenceIndexBasic::search - Inicio (text \""<<text<<"\")\n";
 	
-	unsigned int limite_izq = 0;
-	unsigned int limite_der = largo-1;
+	unsigned long long limite_izq = 0;
+	unsigned long long limite_der = largo-1;
 	
-	for(unsigned int cur_pos = 0; cur_pos < size; ++cur_pos){
+	for(unsigned long long cur_pos = 0; cur_pos < size; ++cur_pos){
 //		cout<<"ReferenceIndexBasic::search - cur_pos: "<<cur_pos<<" (\""<<(text + cur_pos)<<"\", "<<limite_izq<<", "<<limite_der<<")\n";
 		// Se busca el caracter text[cur_pos] en la posicion cur_pos de los sufijos
 		
 		// buscar limite izq
 
 //		// version lineal
-//		unsigned int izq = limite_izq;
+//		unsigned long long izq = limite_izq;
 //		while( (izq < largo) && (
 //			arr[izq] + cur_pos >= largo || 
 //			*(ref + arr[izq] + cur_pos) < text[cur_pos]
@@ -601,9 +601,9 @@ void ReferenceIndexBasic::search(const char *text, unsigned int size, vector<uns
 //		}
 		
 		// Version binaria
-		unsigned int l = limite_izq;
-		unsigned int h = limite_der;
-		unsigned int m;
+		unsigned long long l = limite_izq;
+		unsigned long long h = limite_der;
+		unsigned long long m;
 		while(l < h){
 			m = l + ((h-l)>>1);
 			if( arr[m] + cur_pos > largo || *(ref + arr[m] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -613,7 +613,7 @@ void ReferenceIndexBasic::search(const char *text, unsigned int size, vector<uns
 				h = m;
 			}
 		}
-		unsigned int izq = h;
+		unsigned long long izq = h;
 		// Ajuste adicional (esto es porque h no puede ser mayor a limite_der para romper igualdad)
 		if( (arr[izq] + cur_pos < largo) 
 			&& *(ref + arr[izq] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -625,7 +625,7 @@ void ReferenceIndexBasic::search(const char *text, unsigned int size, vector<uns
 		// Buscar limite der
 		
 //		// Version lineal
-//		unsigned int der = limite_der;
+//		unsigned long long der = limite_der;
 //		while( (der > 0) && (arr[der] + cur_pos < largo) &&
 //			*(ref + arr[der] + cur_pos) > text[cur_pos] 
 //			){
@@ -644,7 +644,7 @@ void ReferenceIndexBasic::search(const char *text, unsigned int size, vector<uns
 				h = m;
 			}
 		}
-		unsigned int der = h;
+		unsigned long long der = h;
 		if( (der > 0) && (arr[der] + cur_pos < largo) 
 			&& *(ref + arr[der] + cur_pos) > (unsigned char)(*(text + cur_pos)) ){
 			--der;

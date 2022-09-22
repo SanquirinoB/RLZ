@@ -29,8 +29,8 @@ int main() {
 	text += "balas";
 	text += "lalabas";
 	string pat = "ba";
-	unsigned int len_r = 9;
-	unsigned int z = 8;
+	unsigned long long len_r = 9;
+	unsigned long long z = 8;
 	
 	bit_vector arr_s(len_r + z, 0);
 	arr_s[0] = 1;
@@ -57,7 +57,7 @@ int main() {
 	cout << "Posicion de 0th 0: " << select0(0) << "\n";
 	
 	// En esta primera prueba, almaceno la permutacion de z descomprimida
-//	vector<unsigned int> pi(8);
+//	vector<unsigned long long> pi(8);
 	int_vector<> pi(8);
 	pi[0] = 0;
 	pi[1] = 3;
@@ -73,7 +73,7 @@ int main() {
 	cout << "pi[5]: " << pi[5] << ", perm[5]: " << perm[5] << "\n";
 	
 	// Para esta prueba tambien guardo ez descomprimido
-//	vector<unsigned int> ez(8);
+//	vector<unsigned long long> ez(8);
 	int_vector<> ez(8);
 	ez[0] = 1;
 	ez[1] = 2;
@@ -102,16 +102,16 @@ int main() {
 	if( occs > 0 ){
 		auto locations = locate(fm_index, query.begin(), query.begin()+m);
 		sort(locations.begin(), locations.end());
-		for( unsigned int i = 0; i < occs; ++i ){
-			unsigned int occ_i = locations[i];
+		for( unsigned long long i = 0; i < occs; ++i ){
+			unsigned long long occ_i = locations[i];
 			cout << "occ[" << i << "]: " << occ_i << " (" << ref.substr(occ_i, m) << ")\n";
 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
-			unsigned int select = select0(occ_i + 1);
-			unsigned int pos_ez = select - 1 - occ_i;
+			unsigned long long select = select0(occ_i + 1);
+			unsigned long long pos_ez = select - 1 - occ_i;
 			cout << "select: " << select << " => pos_ez: " << pos_ez << "\n";
 			
 			// Ahora la busqueda (recursiva) en el rmq (entre 0 y pos_ez)
-			unsigned int max = rmq(0, pos_ez);
+			unsigned long long max = rmq(0, pos_ez);
 			cout << "max: " << max << "\n";
 
 		}
@@ -143,8 +143,8 @@ int main() {
 	}
 	
 	
-	unsigned int n_ints = 100000;
-	unsigned int max_int = 100000;
+	unsigned long long n_ints = 100000;
+	unsigned long long max_int = 100000;
 	cout << "n_ints: " << n_ints << ", max_int: " << max_int << "\n";
 	
 	int_vector<32> arr_32(n_ints);
@@ -166,18 +166,18 @@ int main() {
 	mt19937 generator(seed());
 	uniform_int_distribution<> dist(0, max_int - 1);
 	
-	for(unsigned int i = 0; i < n_ints; ++i){
+	for(unsigned long long i = 0; i < n_ints; ++i){
 		arr[i] = dist(generator);
 	}
 	
 	cout << "size(arr): " << size_in_bytes(arr) << " bytes (" << ((double)(size_in_bytes(arr))*8.0/n_ints) << " bits/int)\n";
-	for(unsigned int i = 0; i < ( (n_ints<10)?n_ints:10 ); ++i){
+	for(unsigned long long i = 0; i < ( (n_ints<10)?n_ints:10 ); ++i){
 		cout << "arr[" << i << "]: " << arr[i] << "\n";
 	}
 	
 	sdsl::util::bit_compress(arr);
 	cout << "size(arr): " << size_in_bytes(arr) << " bytes (" << ((double)(size_in_bytes(arr))*8.0/n_ints) << " bits/int)\n";
-	for(unsigned int i = 0; i < ( (n_ints<10)?n_ints:10 ); ++i){
+	for(unsigned long long i = 0; i < ( (n_ints<10)?n_ints:10 ); ++i){
 		cout << "arr[" << i << "]: " << arr[i] << "\n";
 	}
 

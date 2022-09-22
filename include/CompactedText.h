@@ -19,7 +19,7 @@ class CompactedText {
 private: 
 	
 	// in chars
-	unsigned int len;
+	unsigned long long len;
 	// 1 + len / 4 
 	unsigned char *bytes;
 	

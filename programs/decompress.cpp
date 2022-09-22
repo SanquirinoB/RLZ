@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
 	const char *serialized_reference = argv[1];
 	const char *compressed_file = argv[2];
 	const char *output_text = argv[3];
-	unsigned int buffer_size = atoi(argv[4]);
+	unsigned long long buffer_size = atoi(argv[4]);
 	
 	cout<<"Start (reference \""<<serialized_reference<<"\", compressed \""<<compressed_file<<"\", output \""<<output_text<<"\", block_size "<<buffer_size<<")\n";
 	

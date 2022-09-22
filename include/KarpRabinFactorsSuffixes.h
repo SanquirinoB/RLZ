@@ -26,7 +26,7 @@ using namespace sdsl;
 class KarpRabinFactorsSuffixes {
 
 protected: 
-	unsigned int n_factors;
+	unsigned long long n_factors;
 	// Estructura con los hash de cada prefijo, ordenado posicionalmente por factor
 	// Asi, el primer hash es 0, y el ultimmo (en la posicion *n_factors*) tiene el hash de la coleccion completa
 	vector<unsigned long long> *arr_kr_s;
@@ -54,7 +54,7 @@ public:
 	
 	KarpRabinFactorsSuffixes();
 	
-	KarpRabinFactorsSuffixes(unsigned int _n_factors, 
+	KarpRabinFactorsSuffixes(unsigned long long _n_factors, 
 			vector<unsigned long long> *_arr_kr_s, 
 			KarpRabin *_karp_rabin, 
 			const char *_ref_text, 
@@ -71,7 +71,7 @@ public:
 			bits_b_type::select_0_type *_select0_b, 
 			int_vector<> *_pi_inv);
 	
-	KarpRabinFactorsSuffixes(unsigned int _n_factors, 
+	KarpRabinFactorsSuffixes(unsigned long long _n_factors, 
 			vector<unsigned long long> *_arr_kr_s, 
 			KarpRabin *_karp_rabin, 
 			CompactedText *_compacted_text, 
@@ -91,10 +91,10 @@ public:
 	virtual ~KarpRabinFactorsSuffixes();
 	
 	// Returns the hash from a suffix from a factor (positional), offset and length
-	unsigned long long hash(unsigned int factor_ini, unsigned int offset, unsigned int length);
+	unsigned long long hash(unsigned long long factor_ini, unsigned long long offset, unsigned long long length);
 	
 	// REturns the hash from the start of factor_ini (positional) of length length
-	unsigned long long hash(unsigned int factor_ini, unsigned int length);
+	unsigned long long hash(unsigned long long factor_ini, unsigned long long length);
 	
 	void save(const string &file);
 	

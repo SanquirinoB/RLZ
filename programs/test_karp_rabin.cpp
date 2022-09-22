@@ -29,8 +29,8 @@ int main() {
 	cout << "Inicio\n";
 	
 	
-	unsigned int bits = 8;
-	unsigned int mod = 15485863;
+	unsigned long long bits = 8;
+	unsigned long long mod = 15485863;
 	KarpRabin karp_rabin(bits, mod, 1000000);
 //	KarpRabin karp_rabin(bits, mod, 1100000000);
 	
@@ -45,11 +45,11 @@ int main() {
 		cout << "Wrong Version\n";
 		return 0;
 	}
-	unsigned int len_text = 0;
+	unsigned long long len_text = 0;
 	reader.read((char*)&len_text, sizeof(int));
-	unsigned int n_factors = 0;
+	unsigned long long n_factors = 0;
 	reader.read((char*)&n_factors, sizeof(int));
-	unsigned int len_ref = 0;
+	unsigned long long len_ref = 0;
 	reader.read((char*)&len_ref, sizeof(int));
 	cout << "len_text: " << len_text << ", n_factors: " << n_factors << ", len_ref: " << len_ref << "\n";
 	char *ref_text = new char[len_ref + 1];
@@ -79,23 +79,23 @@ int main() {
 	
 	KarpRabinFactorsSuffixes kr_factors(krs_file, &karp_rabin, ref_text, &select1_s, &select1_b, &select0_b, &pi_inv);
 	
-	unsigned int hash = kr_factors.hash(1000, 1000000, 1000000);
+	unsigned long long hash = kr_factors.hash(1000, 1000000, 1000000);
 	cout << "hash: " << hash << "\n";
 	
 	
 	/*
-	unsigned int n_tests = 1000;
-	unsigned int min_len = 500000;
+	unsigned long long n_tests = 1000;
+	unsigned long long min_len = 500000;
 	
-	vector<unsigned int> hash_table;
-	for(unsigned int i = 0; i < n_tests; ++i){
-		unsigned int hash = kr_factors.hash(1000, 1000000, min_len * i);
+	vector<unsigned long long> hash_table;
+	for(unsigned long long i = 0; i < n_tests; ++i){
+		unsigned long long hash = kr_factors.hash(1000, 1000000, min_len * i);
 		hash_table.push_back(hash);
 	}
 	
 	NanoTimer timer;
-	for(unsigned int i = 0; i < n_tests; ++i){
-		unsigned int hash = kr_factors.hash(1000, 1000000, min_len * i);
+	for(unsigned long long i = 0; i < n_tests; ++i){
+		unsigned long long hash = kr_factors.hash(1000, 1000000, min_len * i);
 		if( hash != hash_table[i] ){
 			cerr << "Error - kr_factors.hash(1000, 1000000, " << (min_len * i) << "): " << hash << " != " << hash_table[i] << "\n";
 			exit(0);
@@ -104,8 +104,8 @@ int main() {
 	cout << "Time 1: " << timer.getMilisec() << "\n";
 	timer.reset();
 	
-	for(unsigned int i = 0; i < n_tests; ++i){
-		unsigned int hash = kr_factors.hashBin(1000, 1000000, min_len * i);
+	for(unsigned long long i = 0; i < n_tests; ++i){
+		unsigned long long hash = kr_factors.hashBin(1000, 1000000, min_len * i);
 		if( hash != hash_table[i] ){
 			cerr << "Error - kr_factors.hashBin(1000, 1000000, " << (min_len * i) << "): " << hash << " != " << hash_table[i] << "\n";
 			exit(0);
@@ -114,8 +114,8 @@ int main() {
 	cout << "Time 2: " << timer.getMilisec() << "\n";
 	timer.reset();
 	
-	for(unsigned int i = 0; i < n_tests; ++i){
-		unsigned int hash = kr_factors.hashFast(1000, 1000000, min_len * i);
+	for(unsigned long long i = 0; i < n_tests; ++i){
+		unsigned long long hash = kr_factors.hashFast(1000, 1000000, min_len * i);
 		if( hash != hash_table[i] ){
 			cerr << "Error - kr_factors.hashFast(1000, 1000000, " << (min_len * i) << "): " << hash << " != " << hash_table[i] << "\n";
 			exit(0);
@@ -145,26 +145,26 @@ int main() {
 	fstream reader(input_file, fstream::in);
 	
 	reader.seekg(0, reader.end);
-	unsigned int length = reader.tellg();
+	unsigned long long length = reader.tellg();
 	reader.seekg(0, reader.beg);
 	
 	vector<char> first_chars;
-	for(unsigned int i = 0; i < length; ++i){
+	for(unsigned long long i = 0; i < length; ++i){
 		char c;
 		reader.read(&c, 1);
 		first_chars.push_back(c);
 	}
 	reader.close();
 	
-	for(unsigned int i = 0; i < 10; ++i){
+	for(unsigned long long i = 0; i < 10; ++i){
 		cout << "first_chars[" << i << "]: " << first_chars[i] << "\n";
 	}
-	for(unsigned int i = length-10; i < length; ++i){
+	for(unsigned long long i = length-10; i < length; ++i){
 		cout << "first_chars[" << i << "]: " << first_chars[i] << "\n";
 	}
 	
 	int_vector<> first_compacetd(length);
-	for(unsigned int i = 0; i < length; ++i){
+	for(unsigned long long i = 0; i < length; ++i){
 		first_compacetd[i] = 0;
 		if( first_chars[i] == 'C' ){
 			first_compacetd[i] = 1;
@@ -184,16 +184,16 @@ int main() {
 	*/
 	
 	/*
-	unsigned int bits = 8;
-//	unsigned int mod = 15485863;
-//	unsigned int bits = 2;
-	unsigned int mod = 787;
-//	unsigned int bits = 2;
-//	unsigned int mod = 223;
+	unsigned long long bits = 8;
+//	unsigned long long mod = 15485863;
+//	unsigned long long bits = 2;
+	unsigned long long mod = 787;
+//	unsigned long long bits = 2;
+//	unsigned long long mod = 223;
 	KarpRabin karp_rabin(bits, mod);
 	
-//	unsigned int base = 1<<bits;
-//	for( unsigned int i = 0; i < 10000; ++i ){
+//	unsigned long long base = 1<<bits;
+//	for( unsigned long long i = 0; i < 10000; ++i ){
 //		cout << "ullpow(" << base << ", " << i << "): " << karp_rabin.ullpow(base, i) << " / " << karp_rabin.ullpow2_rec(bits, i) << " / " << karp_rabin.ullpow2_table(bits, i) << "\n";
 //		if( karp_rabin.ullpow(base, i) != karp_rabin.ullpow2_rec(bits, i) ){
 //			cout << "Error!\n";

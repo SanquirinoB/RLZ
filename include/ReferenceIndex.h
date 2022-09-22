@@ -20,7 +20,7 @@ public:
 
 	// Busca el "text" de largo "size" en el arreglo de sufijos
 	// Guarda la posicion y el largo ("position" y "length") del mayor prefijo comun
-	virtual void find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const;
+	virtual void find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const;
 	
 	// Metodos de save para carga sin construccion
 	virtual void save(const char *ref_file);
@@ -37,13 +37,13 @@ public:
 	
 	// Metodos para acceder al texto
 	// No es claro que todas las referencias sean capaces de hacer esto
-	virtual unsigned int getLength();
+	virtual unsigned long long getLength();
 	
 	virtual const char *getText() const;
 	
 	// De forma similar a find, busca "text" de largo "size" en el arreglo de sufijos
 	// Esta version busca el texto completo y almacena todas las ocurrencias en "res", ordenadas crecientemente
-	virtual void search(const char *text, unsigned int size, vector<unsigned int> &res) const;
+	virtual void search(const char *text, unsigned long long size, vector<unsigned long long> &res) const;
 	
 };
 

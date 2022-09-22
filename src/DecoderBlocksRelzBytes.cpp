@@ -69,12 +69,12 @@ void DecoderBlocksRelzBytes::deleteData(){
 	}
 }
 
-void DecoderBlocksRelzBytes::prepareBuffer(unsigned int new_size){
+void DecoderBlocksRelzBytes::prepareBuffer(unsigned long long new_size){
 	if(new_size > buff_size){
 		deleteBuffers();
 		buff_size = new_size;
-		buff_pos = new unsigned int[buff_size];
-		buff_len = new unsigned int[buff_size];
+		buff_pos = new unsigned long long[buff_size];
+		buff_len = new unsigned long long[buff_size];
 	}
 }
 
@@ -91,7 +91,7 @@ void DecoderBlocksRelzBytes::load(const char *bytes){
 		return;
 	}
 	
-	unsigned int byte_ini_data = headers->getDataPosition();
+	unsigned long long byte_ini_data = headers->getDataPosition();
 	cout<<"DecoderBlocksRelzBytes::load - Cargando datos desde "<<byte_ini_data<<"\n";
 	
 	cout<<"DecoderBlocksRelzBytes::load - new pos_coder...\n";
@@ -107,7 +107,7 @@ void DecoderBlocksRelzBytes::load(const char *bytes){
 	cout<<"DecoderBlocksRelzBytes::load - Fin\n";
 }
 
-unsigned int DecoderBlocksRelzBytes::decodeBlock(unsigned int block, char *buff){
+unsigned long long DecoderBlocksRelzBytes::decodeBlock(unsigned long long block, char *buff){
 	cout<<"DecoderBlocksRelzBytes::decodeBlock - Inicio ("<<block<<")\n";
 	
 	//Recordar que headers tiene 1 bloque mas de los reales (con la posicion final de lectura)
@@ -146,7 +146,7 @@ unsigned int DecoderBlocksRelzBytes::decodeBlock(unsigned int block, char *buff)
 			buff_len);
 		
 //		cout<<"DecoderBlocksRelzBytes::decodeBlock - Revisando "<<cur_block_factores<<" factores\n";
-//		for(unsigned int i = 0; i < ( (cur_block_factores<3)?cur_block_factores:3 ) ; ++i){
+//		for(unsigned long long i = 0; i < ( (cur_block_factores<3)?cur_block_factores:3 ) ; ++i){
 //			cout<<"("<<buff_pos[i]<<", "<<buff_len[i]<<")\n";
 //		}
 		
@@ -154,9 +154,9 @@ unsigned int DecoderBlocksRelzBytes::decodeBlock(unsigned int block, char *buff)
 	}
 	
 	cout<<"DecoderBlocksRelzBytes::decodeBlock - Extrayendo texto\n";
-	unsigned int copied_chars = 0;
+	unsigned long long copied_chars = 0;
 	//Ahora cur_block esta valido en el buff y se puede leer
-	for(unsigned int i = 0; i < cur_block_factores; ++i){
+	for(unsigned long long i = 0; i < cur_block_factores; ++i){
 		//decode (buff_pos[i], buff_len[i])
 		memcpy(buff + copied_chars, texto_ref + buff_pos[i], buff_len[i]);
 		copied_chars += buff_len[i];
@@ -170,7 +170,7 @@ unsigned int DecoderBlocksRelzBytes::decodeBlock(unsigned int block, char *buff)
 	
 //Este metodo retorna un NUEVO objeto headers del tipo correcto
 //Usa los argumentos en la creacion del header
-BlockHeaders *DecoderBlocksRelzBytes::getNewHeaders(unsigned int _text_size, unsigned int _block_size, Metadata *_metadata){
+BlockHeaders *DecoderBlocksRelzBytes::getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata){
 	return new BlockHeadersRelz(_text_size, _block_size, _metadata);
 }
 

@@ -41,8 +41,8 @@ int main(int argc, char* argv[]){
 	const char *serialized_reference = argv[1];
 	const char *sequence_text = argv[2];
 	const char *output = argv[3];
-	unsigned int block_size = atoi(argv[4]);
-	unsigned int n_threads = atoi(argv[5]);
+	unsigned long long block_size = atoi(argv[4]);
+	unsigned long long n_threads = atoi(argv[5]);
 	bool use_metadata = (atoi(argv[6]) == 1);
 	//Dejo la base de golomb por defecto (2^6)
 	

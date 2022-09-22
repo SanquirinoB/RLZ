@@ -38,11 +38,11 @@ public:
 	CoderBlocksRelz(const ReferenceIndex *referencia = NULL);
 	virtual ~CoderBlocksRelz();
 	
-//	virtual void codeBlock(const char *text, unsigned int text_size, fstream *file_headers, fstream *file_data, unsigned int &bytes_headers, unsigned int &bytes_data, const ReferenceIndex *referencia, char *full_buffer);
-	virtual void codeBlock(const char *text, unsigned int text_size, fstream *file_headers, fstream *file_data, unsigned int &bytes_headers, unsigned int &bytes_data, char *full_buffer, vector<pair<unsigned int, unsigned int> > *external_factors = NULL);
+//	virtual void codeBlock(const char *text, unsigned long long text_size, fstream *file_headers, fstream *file_data, unsigned long long &bytes_headers, unsigned long long &bytes_data, const ReferenceIndex *referencia, char *full_buffer);
+	virtual void codeBlock(const char *text, unsigned long long text_size, fstream *file_headers, fstream *file_data, unsigned long long &bytes_headers, unsigned long long &bytes_data, char *full_buffer, vector<pair<unsigned long long, unsigned long long> > *external_factors = NULL);
 	
 	//Retorna el tamaño en bytes del buffer necesario para codeBlock
-	virtual unsigned int codingBufferSize(unsigned int block_size);
+	virtual unsigned long long codingBufferSize(unsigned long long block_size);
 	
 	//Retorna un puntero a un nuevo Coder del mismo tipo
 	//Adicionalmente podria copiar otros datos internos (pero el nuevo objeto debe ser independiente)

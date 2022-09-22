@@ -27,10 +27,10 @@
 using namespace sdsl;
 using namespace std;
 
-void recursive_rmq(unsigned int ini, unsigned int fin, unsigned int crit, rmq_succinct_sct<false, bp_support_sada<256,32,rank_support_v5<> > > &rmq, int_vector<> &ez, inv_perm_support<> &perm){
+void recursive_rmq(unsigned long long ini, unsigned long long fin, unsigned long long crit, rmq_succinct_sct<false, bp_support_sada<256,32,rank_support_v5<> > > &rmq, int_vector<> &ez, inv_perm_support<> &perm){
 	cout << " -> recursive_rmq(" << ini << ", " << fin << ")\n";
 	
-	unsigned int pos_max = rmq(ini, fin);
+	unsigned long long pos_max = rmq(ini, fin);
 	
 	cout << " -> max pos Ez: " << pos_max << " (Ez: " << ez[pos_max] << ", factor: " << perm[pos_max] << ")\n";
 	if( ez[pos_max] < crit ){
@@ -49,14 +49,14 @@ void recursive_rmq(unsigned int ini, unsigned int fin, unsigned int crit, rmq_su
 	}
 }
 
-void recursive_rmq_v2(unsigned int ini, unsigned int fin, unsigned int crit, rmq_succinct_sct<false, bp_support_sada<256,32,rank_support_v5<> > > &rmq, rrr_vector<127>::select_1_type &select1_s, rrr_vector<127>::select_1_type &select1_b, rrr_vector<127>::select_0_type &select0_b, inv_perm_support<> &perm){
+void recursive_rmq_v2(unsigned long long ini, unsigned long long fin, unsigned long long crit, rmq_succinct_sct<false, bp_support_sada<256,32,rank_support_v5<> > > &rmq, rrr_vector<127>::select_1_type &select1_s, rrr_vector<127>::select_1_type &select1_b, rrr_vector<127>::select_0_type &select0_b, inv_perm_support<> &perm){
 	cout << " -> recursive_rmq(" << ini << ", " << fin << ")\n";
 	
-	unsigned int pos_max = rmq(ini, fin);
+	unsigned long long pos_max = rmq(ini, fin);
 	
-	unsigned int tu = select1_s(pos_max + 1) - pos_max;
-	unsigned int pu = select1_b(perm[pos_max] + 1);
-	unsigned int lu = select1_b(perm[pos_max] + 2) - pu;
+	unsigned long long tu = select1_s(pos_max + 1) - pos_max;
+	unsigned long long pu = select1_b(perm[pos_max] + 1);
+	unsigned long long lu = select1_b(perm[pos_max] + 2) - pu;
 	
 //	cout << " -> max pos Ez: " << pos_max << " (Ez: " << ez[pos_max] << ", factor: " << perm[pos_max] << ")\n";
 	cout << " -> max pos Ez: " << pos_max << " (tu: " << tu << ", pu: " << pu << ", lu: " << lu << ")\n";
@@ -76,17 +76,17 @@ void recursive_rmq_v2(unsigned int ini, unsigned int fin, unsigned int crit, rmq
 	}
 }
 
-unordered_map<unsigned int, FactorsIterator> mapa_iterators;
+unordered_map<unsigned long long, FactorsIterator> mapa_iterators;
 
-char getChar(unsigned int factor, unsigned int pos, 
-			unsigned int n_factors, 
+char getChar(unsigned long long factor, unsigned long long pos, 
+			unsigned long long n_factors, 
 			rrr_vector<127>::select_1_type *select1_s, 
 			rrr_vector<127>::select_1_type *select1_b, 
 			rrr_vector<127>::select_0_type *select0_b, 
 			inv_perm_support<> *perm, 
 			inv_perm_support<> *perm_inv, 
 			const char *ref_text, 
-			unsigned int full_size ){
+			unsigned long long full_size ){
 	
 	// Segundo enfoque: cache de iteradores completos
 	if( mapa_iterators.find(factor) == mapa_iterators.end() ){
@@ -110,19 +110,19 @@ char getChar(unsigned int factor, unsigned int pos,
 	return c;
 }
 
-unordered_map<unsigned int, FactorsIteratorReverse> mapa_iterators_rev;
+unordered_map<unsigned long long, FactorsIteratorReverse> mapa_iterators_rev;
 
-char getCharRev(unsigned int factor, unsigned int pos, 
-			unsigned int n_factors, 
+char getCharRev(unsigned long long factor, unsigned long long pos, 
+			unsigned long long n_factors, 
 			rrr_vector<127>::select_1_type *select1_s, 
 			rrr_vector<127>::select_1_type *select1_b, 
 			rrr_vector<127>::select_0_type *select0_b, 
 			inv_perm_support<> *perm, 
 			inv_perm_support<> *perm_inv, 
 			const char *ref_text, 
-			unsigned int full_size ){
+			unsigned long long full_size ){
 	
-	if( factor == (unsigned int)(-1) ){
+	if( factor == (unsigned long long)(-1) ){
 		return 0;
 	}
 	
@@ -146,33 +146,33 @@ char getCharRev(unsigned int factor, unsigned int pos,
 
 // Notar que, a diferencia de la busqueda en referencia, esta debe ser completa
 // Es decir, solo importa el rango que contiene al patron completo
-pair<unsigned int, unsigned int> getRangeY(
+pair<unsigned long long, unsigned long long> getRangeY(
 			const char *pattern,
 			inv_perm_support<> &perm_y,
-			unsigned int n_factors, 
+			unsigned long long n_factors, 
 			rrr_vector<127>::select_1_type *select1_s, 
 			rrr_vector<127>::select_1_type *select1_b, 
 			rrr_vector<127>::select_0_type *select0_b, 
 			inv_perm_support<> *perm, 
 			inv_perm_support<> *perm_inv, 
 			const char *ref_text, 
-			unsigned int full_size ){
+			unsigned long long full_size ){
 	
-	unsigned int pat_len = strlen(pattern);
-	unsigned int izq = 0;
-	unsigned int der = n_factors-1;
+	unsigned long long pat_len = strlen(pattern);
+	unsigned long long izq = 0;
+	unsigned long long der = n_factors-1;
 	
 	cout << "getRangeY - Inicio (pat_len: " << pat_len << ", izq: " << izq << ", der: " << der << ")\n";
 	
-	for( unsigned int cur_pos = 0; cur_pos < pat_len; ++cur_pos ){
+	for( unsigned long long cur_pos = 0; cur_pos < pat_len; ++cur_pos ){
 		cout << "getRangeY - cur_pos: " << cur_pos << " (pattern[" << cur_pos << "]: " << pattern[cur_pos] << ")\n";
 		
-		unsigned int l = izq;
-		unsigned int h = der;
-		unsigned int m;
-		unsigned int fm;
+		unsigned long long l = izq;
+		unsigned long long h = der;
+		unsigned long long m;
+		unsigned long long fm;
 		char c;
-		unsigned int text_len;
+		unsigned long long text_len;
 		
 		// Busqueda binaria del lado izquierdo
 		cout << "getRangeY - l: " << l << ", h: " << h << "\n";
@@ -235,36 +235,36 @@ pair<unsigned int, unsigned int> getRangeY(
 	}
 	
 	cout << "getRangeY - result: (" << izq << ", " << der << ")\n";
-	return pair<unsigned int, unsigned int>(izq, der);
+	return pair<unsigned long long, unsigned long long>(izq, der);
 }
 
-pair<unsigned int, unsigned int> getRangeX(
+pair<unsigned long long, unsigned long long> getRangeX(
 			const char *pattern,
 			inv_perm_support<> &perm_x,
-			unsigned int n_factors, 
+			unsigned long long n_factors, 
 			rrr_vector<127>::select_1_type *select1_s, 
 			rrr_vector<127>::select_1_type *select1_b, 
 			rrr_vector<127>::select_0_type *select0_b, 
 			inv_perm_support<> *perm, 
 			inv_perm_support<> *perm_inv, 
 			const char *ref_text, 
-			unsigned int full_size ){
+			unsigned long long full_size ){
 	
-	unsigned int pat_len = strlen(pattern);
-	unsigned int izq = 0;
-	unsigned int der = n_factors-1;
+	unsigned long long pat_len = strlen(pattern);
+	unsigned long long izq = 0;
+	unsigned long long der = n_factors-1;
 	
 	cout << "getRangeX - Inicio (pat_len: " << pat_len << ", izq: " << izq << ", der: " << der << ")\n";
 	
-	for( unsigned int cur_pos = 0; cur_pos < pat_len; ++cur_pos ){
+	for( unsigned long long cur_pos = 0; cur_pos < pat_len; ++cur_pos ){
 		cout << "getRangeX - cur_pos: " << cur_pos << " (pattern[" << cur_pos << "]: " << pattern[cur_pos] << ")\n";
 		
-		unsigned int l = izq;
-		unsigned int h = der;
-		unsigned int m;
-		unsigned int fm;
+		unsigned long long l = izq;
+		unsigned long long h = der;
+		unsigned long long m;
+		unsigned long long fm;
 		char c;
-		unsigned int text_len;
+		unsigned long long text_len;
 		
 		// Busqueda binaria del lado izquierdo
 		cout << "getRangeX - l: " << l << ", h: " << h << "\n";
@@ -327,7 +327,7 @@ pair<unsigned int, unsigned int> getRangeX(
 	}
 	
 	cout << "getRangeX - result: (" << izq << ", " << der << ")\n";
-	return pair<unsigned int, unsigned int>(izq, der);
+	return pair<unsigned long long, unsigned long long>(izq, der);
 }
 
 int main() {
@@ -340,11 +340,11 @@ int main() {
 	string output = "test_output.relz";
 	string serialized_reference = "test_ref.bin";
 	
-	vector<pair<unsigned int, unsigned int> > factors;
+	vector<pair<unsigned long long, unsigned long long> > factors;
 	
-	unsigned int len_ref = ref.length();
-	unsigned int len_text = text.length();
-	unsigned int z = 0;
+	unsigned long long len_ref = ref.length();
+	unsigned long long len_text = text.length();
+	unsigned long long z = 0;
 	
 	// Construir SA referencia
 	// Esto eventualmente se convertira en un FM-index (csa_wt)
@@ -364,20 +364,20 @@ int main() {
 	
 	cout << "Factors: \n";
 	// Factores en version ini, fin (absoluto) y ordenados por ini
-//	vector<pair<unsigned int, unsigned int> > factors_sort;
-	vector<pair<unsigned int, pair<unsigned int, unsigned int> > > factors_sort;
+//	vector<pair<unsigned long long, unsigned long long> > factors_sort;
+	vector<pair<unsigned long long, pair<unsigned long long, unsigned long long> > > factors_sort;
 	unsigned cur_pos = 0;
-	for( pair<unsigned int, unsigned int> factor : factors ){
+	for( pair<unsigned long long, unsigned long long> factor : factors ){
 		cout << "(" << factor.first << ", " << factor.second << ", " << cur_pos << ")\n";
 		factors_sort.push_back( 
-			pair<unsigned int, pair<unsigned int, unsigned int> >(
-				factor.first, pair<unsigned int, unsigned int>(factor.first + factor.second - 1, cur_pos++)
+			pair<unsigned long long, pair<unsigned long long, unsigned long long> >(
+				factor.first, pair<unsigned long long, unsigned long long>(factor.first + factor.second - 1, cur_pos++)
 				)
 			);
 	}
 	sort(factors_sort.begin(), factors_sort.end());
 	cout << "Factors Sorted: \n";
-	for( pair<unsigned int, pair<unsigned int, unsigned int> > factor : factors_sort ){
+	for( pair<unsigned long long, pair<unsigned long long, unsigned long long> > factor : factors_sort ){
 		cout << "(" << factor.first << ", " << factor.second.first << ", " << factor.second.second << ")\n";
 	}
 	z = factors_sort.size();
@@ -386,9 +386,9 @@ int main() {
 	bit_vector arr_s(len_ref + z, 0);
 	unsigned cur_ref = 0;
 	cur_pos = 0;
-	for( unsigned int i = 0; i < z; ++i ){
-		unsigned int ini = factors_sort[i].first;
-//		unsigned int fin = factors_sort[i].second.first;
+	for( unsigned long long i = 0; i < z; ++i ){
+		unsigned long long ini = factors_sort[i].first;
+//		unsigned long long fin = factors_sort[i].second.first;
 		if( ini == cur_ref ){
 			arr_s[cur_pos++] = 1;
 		}
@@ -399,7 +399,7 @@ int main() {
 		}
 	}
 	cout << "Bit Array S: \n";
-	for( unsigned int i = 0; i < len_ref + z; ++i ){
+	for( unsigned long long i = 0; i < len_ref + z; ++i ){
 		cout << "arr_s[" << i << "]: " << arr_s[i] << "\n";
 	}
 	
@@ -421,21 +421,21 @@ int main() {
 	// Permutacion 
 	int_vector<> pi(z);
 	int_vector<> pi_inv(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		pi[i] = factors_sort[i].second.second;
 		pi_inv[ factors_sort[i].second.second ] = i;
 	}
 	inv_perm_support<> perm_inv(&pi);
 	inv_perm_support<> perm(&pi_inv);
 	cout << "Permutation: \n";
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		cout << "pi[" << i << "]: " << pi[i] << ", perm[" << i << "]: " << perm[i] << ", perm_inv[" << i << "]: " << perm_inv[i] << "\n";
 	}
 	
 	// Posiciones finales Ez
-//	vector<unsigned int> ez(8);
+//	vector<unsigned long long> ez(8);
 	int_vector<> ez(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		ez[i] = factors_sort[i].second.first;
 	}
 	// rmq_succinct_sct<> rmq(&ez);
@@ -444,15 +444,15 @@ int main() {
 	
 	// Bit vector B (inicio de las frases en texto)
 	bit_vector arr_b(len_text, 0);
-	unsigned int pos_text = 0;
-	for( unsigned int i = 0; i < z; ++i ){
-//		unsigned int ini = factors[i].first;
-		unsigned int len = factors[i].second;
+	unsigned long long pos_text = 0;
+	for( unsigned long long i = 0; i < z; ++i ){
+//		unsigned long long ini = factors[i].first;
+		unsigned long long len = factors[i].second;
 		arr_b[ pos_text ] = 1;
 		pos_text += len;
 	}
 	cout << "Bit Vector B: \n";
-	for( unsigned int i = 0; i < len_text; ++i ){
+	for( unsigned long long i = 0; i < len_text; ++i ){
 		cout << "B[" << i << "]: " << arr_b[i] << "\n";
 	}
 	rrr_vector<127> rrr_b(arr_b);
@@ -478,16 +478,16 @@ int main() {
 	if( occs > 0 ){
 		auto locations = locate(fm_index, query.begin(), query.begin()+m);
 		sort(locations.begin(), locations.end());
-		for( unsigned int i = 0; i < occs; ++i ){
-			unsigned int occ_i = locations[i];
+		for( unsigned long long i = 0; i < occs; ++i ){
+			unsigned long long occ_i = locations[i];
 			cout << "occ[" << i << "]: " << occ_i << " (" << ref.substr(occ_i, m) << ")\n";
 			// Comprobar los factores que cuben esta ocurrencia (el string ref[occ_i, occ_i + m - 1])
-			unsigned int select = select0_s(occ_i + 1);
-			unsigned int pos_ez = select - 1 - occ_i;
+			unsigned long long select = select0_s(occ_i + 1);
+			unsigned long long pos_ez = select - 1 - occ_i;
 			cout << "select: " << select << " => pos_ez: " << pos_ez << "\n";
 			
 			// Ahora la busqueda (recursiva) en el rmq (entre 0 y pos_ez)
-//			unsigned int pos_max = rmq(0, pos_ez);
+//			unsigned long long pos_max = rmq(0, pos_ez);
 //			cout << "max pos Ez: " << pos_max << " (Ez: " << ez[pos_max] << ", factor: " << perm[pos_max] << ")\n";
 			cout << "----- Search V1 -----\n";
 			recursive_rmq(0, pos_ez, (occ_i + m - 1), rmq, ez, perm);
@@ -504,7 +504,7 @@ int main() {
 	// Creo que seria ideal preparar iteradores de factor directo y reverso, que accedan a la referencia
 	// Esas estructuras deberian poder usar las estructuras comprimidas para evaluar la info de los factores
 	// Cada iterador internamente puede mantener los valores actuales dada un cur_pos actual
-	// Basta con que los iteradores retornen el char de cierta pos FactorsIterator::get(unsigned int pos) o "char FactorsIterator::next()"
+	// Basta con que los iteradores retornen el char de cierta pos FactorsIterator::get(unsigned long long pos) o "char FactorsIterator::next()"
 	// A parte del next, necesitaria una forma de controlar el final del iterator, quizas "bool FactorsIterator::hasNext()"
 	
 	
@@ -614,8 +614,8 @@ int main() {
 	cout << "-----\n";
 	
 	cout << "Probando acceso posicional\n";
-	unsigned int f = 5;
-	for( unsigned int i = 0; i < 10; ++i ){
+	unsigned long long f = 5;
+	for( unsigned long long i = 0; i < 10; ++i ){
 		char c = getChar( f, i, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		if( c == 0){
 			break;
@@ -624,7 +624,7 @@ int main() {
 	}
 	cout << "-----\n";
 	f = 7;
-	for( unsigned int i = 0; i < 10; ++i ){
+	for( unsigned long long i = 0; i < 10; ++i ){
 		char c = getChar( f, i, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		if( c == 0){
 			break;
@@ -633,7 +633,7 @@ int main() {
 	}
 	cout << "-----\n";
 	f = 3;
-	for( unsigned int i = 0; i < 10; ++i ){
+	for( unsigned long long i = 0; i < 10; ++i ){
 		char c = getChar( f, i, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		if( c == 0){
 			break;
@@ -644,7 +644,7 @@ int main() {
 	
 	cout << "Probando acceso posicional Reverso\n";
 	f = 3;
-	for( unsigned int i = 0; i < 10; ++i ){
+	for( unsigned long long i = 0; i < 10; ++i ){
 		char c = getCharRev( f-1, i, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		if( c == 0){
 			break;
@@ -653,7 +653,7 @@ int main() {
 	}
 	cout << "-----\n";
 	f = 5;
-	for( unsigned int i = 0; i < 10; ++i ){
+	for( unsigned long long i = 0; i < 10; ++i ){
 		char c = getCharRev( f-1, i, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		if( c == 0){
 			break;
@@ -668,46 +668,46 @@ int main() {
 	cout << "-----\n";
 	
 	cout << "Preparando arr X\n";
-	vector<unsigned int> arr_x(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	vector<unsigned long long> arr_x(z);
+	for( unsigned long long i = 0; i < z; ++i ){
 		arr_x[i] = i;
 	}
 	FactorsIteratorReverseComparator comp_rev(z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 	stable_sort(arr_x.begin(), arr_x.end(), comp_rev);
 	int_vector<> pre_x_inv(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		pre_x_inv[ arr_x[i] ] = i;
 	}
 	inv_perm_support<> perm_x(&pre_x_inv);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		pre_x_inv[ arr_x[i] ] = i;
 		cout << " arr_x[" << i << "]: " << arr_x[i] << " (perm_x[" << i << "]: " << perm_x[i] << ") \n";
 	}
 	cout << "-----\n";
 	
 	cout << "Preparando arr Y\n";
-	vector<unsigned int> arr_y(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	vector<unsigned long long> arr_y(z);
+	for( unsigned long long i = 0; i < z; ++i ){
 		arr_y[i] = i;
 	}
 	FactorsIteratorComparator comp(z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 	stable_sort(arr_y.begin(), arr_y.end(), comp);
 	int_vector<> pre_y(z);
 	int_vector<> pre_y_inv(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		pre_y[i] = arr_y[i];
 		pre_y_inv[ arr_y[i] ] = i;
 	}
 	inv_perm_support<> perm_y_inv(&pre_y);
 	inv_perm_support<> perm_y(&pre_y_inv);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		cout << " arr_y[" << i << "]: " << arr_y[i] << " (perm_y[" << i << "]: " << perm_y[i] << ", perm_y_inv[" << i << "]: " << perm_y_inv[i] << ")\n";
 	}
 	cout << "-----\n";
 	
 	cout << "Preparando WT\n";
 	int_vector<> values_wt(z);
-	for( unsigned int i = 0; i < z; ++i ){
+	for( unsigned long long i = 0; i < z; ++i ){
 		values_wt[i] = perm_y_inv[ arr_x[ i ] ];
 		cout << " values_wt[" << i << "]: " << values_wt[i] << " \n";
 	}
@@ -768,15 +768,15 @@ int main() {
 	
 	
 	string pattern = "AB";
-	for(unsigned int i = 1; i < pattern.length(); ++i){
+	for(unsigned long long i = 1; i < pattern.length(); ++i){
 		string p1 = pattern.substr(0, i);
 		string p2 = pattern.substr(i, pattern.length() - i);
 		cout << "Corte de \"" << pattern << "\": (" << p1 << "| " << p2 << ")\n";
-		pair<unsigned int, unsigned int> r1 = getRangeX(p1.c_str(), perm_x, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
-		pair<unsigned int, unsigned int> r2 = getRangeY(p2.c_str(), perm_y, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
+		pair<unsigned long long, unsigned long long> r1 = getRangeX(p1.c_str(), perm_x, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
+		pair<unsigned long long, unsigned long long> r2 = getRangeY(p2.c_str(), perm_y, z, &select1_s, &select1_b, &select0_b, &perm, &perm_inv, ref.c_str(), len_text);
 		
-		if( r1.second == (unsigned int)(-1) || r1.second < r1.first
-			|| r2.second == (unsigned int)(-1) || r2.second < r1.first ){
+		if( r1.second == (unsigned long long)(-1) || r1.second < r1.first
+			|| r2.second == (unsigned long long)(-1) || r2.second < r1.first ){
 			cout << "Rangos Invalidos, omitiendo...\n";
 			continue;
 		}

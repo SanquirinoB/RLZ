@@ -19,7 +19,7 @@ void DecoderBlocks::load(const char *master_file){
 	cerr<<"DecoderBlocks::load - No Implementado\n";
 }
 
-unsigned int DecoderBlocks::decodeBlock(unsigned int block, char *buff){
+unsigned long long DecoderBlocks::decodeBlock(unsigned long long block, char *buff){
 	cerr<<"DecoderBlocks::load - No Implementado\n";
 	return 0;
 }
@@ -31,14 +31,14 @@ unsigned long long DecoderBlocks::getTextSize(){
 	return headers->getTextSize();
 }
 
-unsigned int DecoderBlocks::getBlockSize(){
+unsigned long long DecoderBlocks::getBlockSize(){
 	if(headers == NULL){
 		return 0;
 	}
 	return headers->getBlockSize();
 }
 
-unsigned int DecoderBlocks::getNumBlocks(){
+unsigned long long DecoderBlocks::getNumBlocks(){
 	if(headers == NULL){
 		return 0;
 	}
@@ -51,7 +51,7 @@ BlockHeaders *DecoderBlocks::getHeaders(){
 	
 //Este metodo retorna un NUEVO objeto headers del tipo correcto
 //Usa los argumentos en la creacion del header
-BlockHeaders *DecoderBlocks::getNewHeaders(unsigned long long _text_size, unsigned int _block_size, Metadata *_metadata){
+BlockHeaders *DecoderBlocks::getNewHeaders(unsigned long long _text_size, unsigned long long _block_size, Metadata *_metadata){
 	return new BlockHeaders(_text_size, _block_size, _metadata);
 }
 

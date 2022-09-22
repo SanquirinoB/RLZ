@@ -9,7 +9,7 @@ BitsUtils::BitsUtils(){
 
 BitsUtils::~BitsUtils(){}
 
-void BitsUtils::setGolombBase(unsigned int base_power){
+void BitsUtils::setGolombBase(unsigned long long base_power){
 	if(base_power < 1 || base_power > 32){
 		cerr<<"setGolombBase - Base not supported (Preserving "<<GOLOMB_BASE<<")\n";
 		return;
@@ -22,8 +22,8 @@ void BitsUtils::setGolombBase(unsigned int base_power){
 	}
 }
 
-unsigned int BitsUtils::n_bits(unsigned int num){
-	unsigned int ret = 1;
+unsigned long long BitsUtils::n_bits(unsigned long long num){
+	unsigned long long ret = 1;
 	while( num >>= 1 ){
 		++ret;
 	}
@@ -36,7 +36,7 @@ unsigned int BitsUtils::n_bits(unsigned int num){
 // - "pos_out" es la posicion en bits en la salida para escribir
 // - "len_num" es el largo de la escritura en bits
 // - "num" es el numero que se desea escribir
-void BitsUtils::bitput(unsigned int *out, unsigned int pos_out, unsigned int len_num, unsigned int num){
+void BitsUtils::bitput(unsigned long long *out, unsigned long long pos_out, unsigned long long len_num, unsigned long long num){
 //	cout<<" -> bitput - "<<len_num<<" bits de "<<num<<" en posicion "<<pos_out<<"\n";
 	out += pos_out >> BITS_WORD;
 	// Con esto pos_out marca el bit dentro del int donde empieza la escritura
@@ -62,10 +62,10 @@ void BitsUtils::bitput(unsigned int *out, unsigned int pos_out, unsigned int len
 }
 
 //Retorna el numero de "len_num" bits desde "pos" de la "in"
-unsigned int BitsUtils::bitget(unsigned int *in, unsigned int pos, unsigned int len_num){
-	unsigned int i = (pos >> 5);
-	unsigned int j = pos & 0x1f;
-	unsigned int answ;
+unsigned long long BitsUtils::bitget(unsigned long long *in, unsigned long long pos, unsigned long long len_num){
+	unsigned long long i = (pos >> 5);
+	unsigned long long j = pos & 0x1f;
+	unsigned long long answ;
 	if( j + len_num <= WORD_SIZE ){
 		answ = (in[i] << (WORD_SIZE-j-len_num)) >> (WORD_SIZE - len_num);
 	}
@@ -76,19 +76,19 @@ unsigned int BitsUtils::bitget(unsigned int *in, unsigned int pos, unsigned int 
 	return answ;
 }
 
-unsigned int BitsUtils::bits_golomb(unsigned int num){
+unsigned long long BitsUtils::bits_golomb(unsigned long long num){
 	return ( 1 + (num >> GOLOMB_BITS_BASE) + GOLOMB_BITS_BASE );
 }
 
 //Escribe el numero "num" en la posicion "pos_write" (en bits) de la "out"
 //Retorna el numero de bits usados (para ajustar pos_write)
-unsigned int BitsUtils::write_golomb(unsigned int *out, unsigned int pos_write, unsigned int num){
+unsigned long long BitsUtils::write_golomb(unsigned long long *out, unsigned long long pos_write, unsigned long long num){
 	
-	unsigned int pos_out = pos_write;
-	//unsigned int q = num / GOLOMB_BASE;
-	//unsigned int resto = num % GOLOMB_BASE;
-	unsigned int q = (num >> GOLOMB_BITS_BASE);
-	unsigned int resto = (num & GOLOMB_MASK_BASE);
+	unsigned long long pos_out = pos_write;
+	//unsigned long long q = num / GOLOMB_BASE;
+	//unsigned long long resto = num % GOLOMB_BASE;
+	unsigned long long q = (num >> GOLOMB_BITS_BASE);
+	unsigned long long resto = (num & GOLOMB_MASK_BASE);
 	
 //	cout<<"write_golomb - numero "<<num<<", q: "<<q<<", resto: "<<resto<<" (base "<<GOLOMB_BASE<<", "<<GOLOMB_BITS_BASE<<" bits para el resto)\n";
 	
@@ -102,7 +102,7 @@ unsigned int BitsUtils::write_golomb(unsigned int *out, unsigned int pos_write, 
 	}
 	
 	//Notar que esta mascara debe ser construida de derecha a izquiera
-	unsigned int mascara_q = ((1<<q) - 1) ;
+	unsigned long long mascara_q = ((1<<q) - 1) ;
 	//escribir la mascara (se escriben q+1 bits en total)
 	bitput(out, pos_out, q+1, mascara_q);
 	pos_out += (q+1);
@@ -119,13 +119,13 @@ unsigned int BitsUtils::write_golomb(unsigned int *out, unsigned int pos_write, 
 
 //Lee el proximo numero a partir de la posicion "pos_read" de la "in"
 //Guarda el numero leido en "num" y retorna el numero de bits leidos
-unsigned int BitsUtils::read_golomb(unsigned int *in, unsigned int pos_read, unsigned int &num){
+unsigned long long BitsUtils::read_golomb(unsigned long long *in, unsigned long long pos_read, unsigned long long &num){
 	
 //	cout<<"read_golomb - desde pos: "<<pos_read<<"\n";
 		
-	unsigned int pos_out = pos_read;
-	unsigned int q = 0;
-	unsigned int resto = 0;
+	unsigned long long pos_out = pos_read;
+	unsigned long long q = 0;
+	unsigned long long resto = 0;
 	
 	//leer los 1's de q
 	//Para numeros grandes esta cantidad podria ser considerable
@@ -134,12 +134,12 @@ unsigned int BitsUtils::read_golomb(unsigned int *in, unsigned int pos_read, uns
 	//Luego un ciclo para leer ints entreos (runs de 32 1's)
 	//Luego (cuando un entero rompa ese ciclo) leer el resto uno a uno
 	
-	unsigned int *in_local = ( in + (pos_out >> 5) );
+	unsigned long long *in_local = ( in + (pos_out >> 5) );
 	
 	//si el resto del entero actual es de 1's, entonces tiene sentido hacer procesos especiales
 	//Si no, entonces basta con tomar el primer 0 del entero actual
 	//Notar que ese segundo caso es equivalente a pasar las dos verificaciones previas
-	unsigned int mask = (0xffffffff << (pos_out & 0x1f));
+	unsigned long long mask = (0xffffffff << (pos_out & 0x1f));
 	if( (*in_local & mask) == mask ){
 //		cout<<"read_golomb - resto de entero de 1s\n";
 		//1's en el entero actual
@@ -185,10 +185,10 @@ unsigned int BitsUtils::read_golomb(unsigned int *in, unsigned int pos_read, uns
 	return (pos_out - pos_read);
 }
 
-unsigned int BitsUtils::BitsUtils::write_gamma(unsigned int *out, unsigned int pos_write, unsigned int num){
+unsigned long long BitsUtils::BitsUtils::write_gamma(unsigned long long *out, unsigned long long pos_write, unsigned long long num){
 	
-	unsigned int n = n_bits(num) - 1;
-	unsigned int pos_out = pos_write;
+	unsigned long long n = n_bits(num) - 1;
+	unsigned long long pos_out = pos_write;
 	
 //	cout<<"write_gamma - numero "<<num<<", n: "<<n<<" (pos_out: "<<pos_out<<")\n";
 	
@@ -216,18 +216,18 @@ unsigned int BitsUtils::BitsUtils::write_gamma(unsigned int *out, unsigned int p
 	return (pos_out - pos_write);
 }
 
-unsigned int BitsUtils::read_gamma(unsigned int *in, unsigned int pos_read, unsigned int &num){
+unsigned long long BitsUtils::read_gamma(unsigned long long *in, unsigned long long pos_read, unsigned long long &num){
 	
-	unsigned int pos_out = pos_read;
-	unsigned int n = 0;
-	unsigned int resto = 0;
+	unsigned long long pos_out = pos_read;
+	unsigned long long n = 0;
+	unsigned long long resto = 0;
 	
 	//Leer los 0's hasta el primer 1
-	unsigned int *in_local = ( in + (pos_out >> BITS_WORD) );
+	unsigned long long *in_local = ( in + (pos_out >> BITS_WORD) );
 	
 	//Notar que n puede ser, a lo mas, 32
 //	cout<<"read_gamma - leyendo n\n";
-	unsigned int mask_bit = (1 << (pos_out & 0x1f) );
+	unsigned long long mask_bit = (1 << (pos_out & 0x1f) );
 	for(n = 0; n < 32; ++n){
 //		cout<<"Probando mascara "<<mask_bit<<" ("<<((*in_local & mask_bit) == mask_bit)<<")\n";
 		++pos_out;
@@ -261,7 +261,7 @@ unsigned int BitsUtils::read_gamma(unsigned int *in, unsigned int pos_read, unsi
 	
 }
 
-unsigned int BitsUtils::write_varbyte(unsigned char *buff, unsigned long long num){
+unsigned long long BitsUtils::write_varbyte(unsigned char *buff, unsigned long long num){
 	
 	unsigned char *out = buff;
 	
@@ -389,28 +389,8 @@ unsigned int BitsUtils::write_varbyte(unsigned char *buff, unsigned long long nu
 
 //Lee el primer numero en varbyte (y lo almacena en num) retornando el numero de bytes leidos
 //Notar que el llamador debe mover el buffer entre lecturas
-unsigned int BitsUtils::read_varbyte(unsigned char *buff, unsigned long long &num){
-	
-	//Notar que en esta version se usan 9 bytes max, quizas pueda usarse eso como ventaja
-	//Ademas, eso puede usarse para mejorar la seguridad (maximo 9 ciclos)
-	
-	num = 0;
-	unsigned char *in = buff;
-	while( (*in & 0x80) ){
-		num |= (*in & 0x7f);
-		num <<= 7;
-		++in;
-	}
-	num |= *in;
-	++in;
-	
-	return (in - buff);
-}
-
-//Lee el primer numero en varbyte (y lo almacena en num) retornando el numero de bytes leidos
-//Notar que el llamador debe mover el buffer entre lecturas
 //Esta version trunca el numero leido a 32 bits (pero retorna en numero real de bytes leidos)
-unsigned int BitsUtils::read_varbyte(unsigned char *buff, unsigned int &num){
+unsigned long long BitsUtils::read_varbyte(unsigned char *buff, unsigned long long &num){
 	
 	//Notar que en esta version se usan 9 bytes max, quizas pueda usarse eso como ventaja
 	//Ademas, eso puede usarse para mejorar la seguridad (maximo 9 ciclos)
@@ -425,12 +405,12 @@ unsigned int BitsUtils::read_varbyte(unsigned char *buff, unsigned int &num){
 	llnum |= *in;
 	++in;
 	
-	num = (unsigned int)llnum;
+	num = (unsigned long long)llnum;
 	
 	return (in - buff);
 }
 
-unsigned int BitsUtils::size_varbyte(unsigned long long num){
+unsigned long long BitsUtils::size_varbyte(unsigned long long num){
 	if(num < 0x80){
 		return 1;
 	}

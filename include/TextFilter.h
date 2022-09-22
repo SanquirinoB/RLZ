@@ -32,7 +32,7 @@ public:
 	
 	// Almacena el alfabeto valido completo en alphabet (si es NULL lo omite)
 	// Retorna el total de chars validos (incluso si alphabet == NULL)
-	virtual unsigned int getAlphabet(vector<char> *alphabet = NULL);
+	virtual unsigned long long getAlphabet(vector<char> *alphabet = NULL);
 	
 	// Realiza la lectura y FILTRADO del texto y lo retorna como un c-string
 	// El llamador debe encargarse de liberar la memoria del texto retornado
@@ -43,10 +43,10 @@ public:
 	
 	// Similar al anterior, pero diseñado especificamente para leer la referencia
 	// Este metodo SOLO extrae los caracteres 'A', 'C', 'G' y 'T' (pasa las minusculas a mayusculas)
-	virtual unsigned int readReference(const char *in_file, char *text);
+	virtual unsigned long long readReference(const char *in_file, char *text);
 	
 	// Como el anterior pero deja pasar todo en A-Z, 0-9
-	virtual unsigned int readReferenceFull(const char *in_file, char *text);
+	virtual unsigned long long readReferenceFull(const char *in_file, char *text);
 	
 	// Revisa el texto eliminando los '\n' y guardando el largo de cada linea en nl_pos (si es != NULL)
 	// Esta pensado para limpiar un texto YA FILTRADO por readText

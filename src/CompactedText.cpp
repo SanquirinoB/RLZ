@@ -16,7 +16,7 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 	// En construccion pido el peor caso por simplicidad
 	bytes = new unsigned char[1 + _len/4];
 	memset((char*)bytes, 0, 1 + _len/4);
-	unsigned int in_pos = 0;
+	unsigned long long in_pos = 0;
 	unsigned long long out_pos = 0;
 	unsigned char value = 0;
 	for(unsigned long long i = 0; i < _len; ++i){
@@ -41,7 +41,7 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 			continue;
 		}
 		value <<= (in_pos * 2);
-//		cout << "CompactedText - Adding " << (unsigned int)value << " (to " << (unsigned int)bytes[out_pos] << " from " << text[i] << ")\n";
+//		cout << "CompactedText - Adding " << (unsigned long long)value << " (to " << (unsigned long long)bytes[out_pos] << " from " << text[i] << ")\n";
 		bytes[out_pos] += value;
 		if( ++in_pos == 4 ){
 			in_pos = 0;
@@ -54,7 +54,7 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 //	}
 //	cout << "CompactedText - len: " << len << ", n_bytes: " << n_bytes << "\n";
 //	for(unsigned long long i = 0; i < n_bytes; ++i){
-//		cout << "CompactedText - byte[" << i << "]: " << (unsigned int)bytes[i] << "\n";
+//		cout << "CompactedText - byte[" << i << "]: " << (unsigned long long)bytes[i] << "\n";
 //	}
 }
 
@@ -72,10 +72,10 @@ char CompactedText::operator[](unsigned long long pos){
 		return 0;
 	}
 //	unsigned char byte = bytes[pos/4];
-//	cout << "CompactedText::operator[] - byte (start): " << (unsigned int)byte << " (byte_pos: " << (pos/4) << ", r_pos: " << (pos&0x3) << ")\n";
+//	cout << "CompactedText::operator[] - byte (start): " << (unsigned long long)byte << " (byte_pos: " << (pos/4) << ", r_pos: " << (pos&0x3) << ")\n";
 //	byte >>= ((pos&0x3)*2);
 //	byte &= 0x3;
-//	cout << "CompactedText::operator[] - byte (end): " << (unsigned int)byte << "\n";
+//	cout << "CompactedText::operator[] - byte (end): " << (unsigned long long)byte << "\n";
 //	return table[byte];
 	return table[ ( bytes[pos>>2] >> ((pos&0x3)<<1) ) & 0x3 ];
 }

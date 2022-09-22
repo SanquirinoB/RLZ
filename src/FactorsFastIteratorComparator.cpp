@@ -6,7 +6,7 @@ FactorsFastIteratorComparator::FactorsFastIteratorComparator(){
 	full_size = 0;
 }
 
-FactorsFastIteratorComparator::FactorsFastIteratorComparator(vector<unsigned int> *_factors_starts, char *_full_text, unsigned int _full_size) {
+FactorsFastIteratorComparator::FactorsFastIteratorComparator(vector<unsigned long long> *_factors_starts, char *_full_text, unsigned long long _full_size) {
 	factors_starts = _factors_starts;
 	full_text = _full_text;
 	full_size = _full_size;
@@ -18,7 +18,7 @@ FactorsFastIteratorReverseComparator::FactorsFastIteratorReverseComparator(){
 	full_size = 0;
 }
 
-FactorsFastIteratorReverseComparator::FactorsFastIteratorReverseComparator(vector<unsigned int> *_factors_starts, char *_full_text, unsigned int _full_size) {
+FactorsFastIteratorReverseComparator::FactorsFastIteratorReverseComparator(vector<unsigned long long> *_factors_starts, char *_full_text, unsigned long long _full_size) {
 	factors_starts = _factors_starts;
 	full_text = _full_text;
 	full_size = _full_size;

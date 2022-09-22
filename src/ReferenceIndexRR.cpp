@@ -13,7 +13,7 @@ ReferenceIndexRR::ReferenceIndexRR(const char *ref_file_rr){
 	load(ref_file_rr);
 }
 
-ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned int distancia){
+ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned long long distancia){
 	arr = NULL;
 	largo = 0;
 	largo_arr = 0;
@@ -36,7 +36,7 @@ ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned int distancia)
 	lector.read((char*)ref, largo);
 	ref[largo] = 0;
 	
-	unsigned int protected_pos = 1024 + 256;
+	unsigned long long protected_pos = 1024 + 256;
 	
 	//Preparacion de arr
 	largo_arr = (largo-protected_pos) / distancia;
@@ -46,17 +46,17 @@ ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned int distancia)
 	largo_arr += protected_pos;
 	
 	cout<<"ReferenceIndexRR - Escogiendo "<<largo_arr<<" posiciones del SA (protected_pos: "<<protected_pos<<")\n";
-	arr = new unsigned int[largo_arr];
+	arr = new unsigned long long[largo_arr];
 	
 	//Llenado de arr
 	
 	//Segmento protegido
-	for(unsigned int i = 0; i < protected_pos; ++i){
+	for(unsigned long long i = 0; i < protected_pos; ++i){
 		lector.read((char*)(arr + i), sizeof(int));
 	}
 	
 	//v1: RR directo
-	for(unsigned int i = protected_pos; i < largo_arr; ++i){
+	for(unsigned long long i = protected_pos; i < largo_arr; ++i){
 		lector.read((char*)(arr + i), sizeof(int));
 		if(distancia > 1){
 			lector.ignore( (distancia - 1) * sizeof(int) );
@@ -65,10 +65,10 @@ ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned int distancia)
 	
 	//v2: al azar (con set temporal para posiciones seleccionadas)
 	/*
-	set<unsigned int> posiciones_tomadas;
-	set<unsigned int>::iterator it_pos;
-	unsigned int pos = 0;
-	for(unsigned int i = 0; i < largo_arr; ++i){
+	set<unsigned long long> posiciones_tomadas;
+	set<unsigned long long>::iterator it_pos;
+	unsigned long long pos = 0;
+	for(unsigned long long i = 0; i < largo_arr; ++i){
 		pos = rand() % largo;
 		while( posiciones_tomadas.find(pos) != posiciones_tomadas.end() ){
 			pos = rand() % largo;
@@ -76,7 +76,7 @@ ReferenceIndexRR::ReferenceIndexRR(const char *ref_file, unsigned int distancia)
 		posiciones_tomadas.insert(pos);
 	}
 	pos = 0;
-	unsigned int *arr_pos = arr;
+	unsigned long long *arr_pos = arr;
 	for(it_pos = posiciones_tomadas.begin(); it_pos != posiciones_tomadas.end(); it_pos++){
 		if( pos < *it_pos ){
 			lector.ignore( (*it_pos - pos) * sizeof(int) );
@@ -106,7 +106,7 @@ ReferenceIndexRR::~ReferenceIndexRR(){
 
 //Busca el "text" en el arreglo de sufijos
 //Guarda la posicio y el largo del mayor prefijo comun
-void ReferenceIndexRR::find(const char *text, unsigned int size, unsigned int &position, unsigned int &length) const{
+void ReferenceIndexRR::find(const char *text, unsigned long long size, unsigned long long &position, unsigned long long &length) const{
 	position = 0;
 	length = 0;
 	
@@ -115,18 +115,18 @@ void ReferenceIndexRR::find(const char *text, unsigned int size, unsigned int &p
 	//Notar que es trivial preparar limites ajustados para, por ejemplo, las primeras 2 letras de la query
 	//Eso seria equivalente a evitar las 2 primeras iteraciones del for (las mas largas, obviamente)
 	
-	unsigned int limite_izq = 0;
-	unsigned int limite_der = largo_arr - 1;
-	unsigned int utimo_comun = 0xffffffff;
+	unsigned long long limite_izq = 0;
+	unsigned long long limite_der = largo_arr - 1;
+	unsigned long long utimo_comun = 0xffffffff;
 	
-	for(unsigned int cur_pos = 0; cur_pos < size; ++cur_pos){
+	for(unsigned long long cur_pos = 0; cur_pos < size; ++cur_pos){
 //		cout<<"ReferenceIndexRR::find - cur_pos: "<<cur_pos<<" ("<<limite_izq<<", "<<limite_der<<")\n";
 		//se busca el caracter text[cur_pos] en la posicion cur_pos de los sufijos
 		
 		//buscar limite izq
 
 //		//version lineal
-//		unsigned int izq = limite_izq;
+//		unsigned long long izq = limite_izq;
 //		while( (izq < largo_arr) && (
 //			arr[izq] + cur_pos > largo || 
 //			*(ref + arr[izq] + cur_pos) < text[cur_pos]
@@ -135,9 +135,9 @@ void ReferenceIndexRR::find(const char *text, unsigned int size, unsigned int &p
 //		}
 
 		//Version binaria
-		unsigned int l = limite_izq;
-		unsigned int h = limite_der;
-		unsigned int m;
+		unsigned long long l = limite_izq;
+		unsigned long long h = limite_der;
+		unsigned long long m;
 		while(l < h){
 			m = l + ((h-l)>>1);
 			if( arr[m] + cur_pos > largo || *(ref + arr[m] + cur_pos) < (unsigned char)(*(text + cur_pos)) ){
@@ -147,14 +147,14 @@ void ReferenceIndexRR::find(const char *text, unsigned int size, unsigned int &p
 				h = m;
 			}
 		}
-		unsigned int izq = h;
+		unsigned long long izq = h;
 		
 //		cout<<"ReferenceIndexRR::find - izq: "<<izq<<"\n";
 		
 		//buscar limite der
 		
 //		//version lineal
-//		unsigned int der = limite_der;
+//		unsigned long long der = limite_der;
 //		while( (der > 0) && (arr[der] + cur_pos < largo) &&
 //			*(ref + arr[der] + cur_pos) > text[cur_pos] 
 //			){
@@ -173,7 +173,7 @@ void ReferenceIndexRR::find(const char *text, unsigned int size, unsigned int &p
 				h = m;
 			}
 		}
-		unsigned int der = h;
+		unsigned long long der = h;
 		if( (arr[der] + cur_pos < largo) 
 			&& *(ref + arr[der] + cur_pos) > (unsigned char)(*(text + cur_pos)) ){
 			--der;
@@ -247,7 +247,7 @@ void ReferenceIndexRR::load(const char *ref_file){
 	lector.read((char*)ref, largo);
 	ref[largo] = 0;
 	
-	arr = new unsigned int[largo_arr];
+	arr = new unsigned long long[largo_arr];
 	lector.read((char*)arr, largo_arr * sizeof(int));
 	
 	lector.close();
