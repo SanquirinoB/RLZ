@@ -80,10 +80,10 @@ public:
 class CompactedFactorsFastIteratorComparator : public std::binary_function<unsigned long long, unsigned long long, bool>
 {
 private:
-	sd_vector<unsigned long long>::rank_1_type rank_factors;
-    sd_vector<unsigned long long>::select_1_type select_factors;
-	vector<pair<unsigned long long, unsigned long long>> *factors;
-	char *ref_text;
+	sd_vector<>::rank_1_type rank_factors;
+    sd_vector<>::select_1_type select_factors;
+	vector<pair<unsigned long long, unsigned long long>> factors;
+	const char *ref_text;
 	unsigned long long full_size;
 
 	//	Cache data   									  (pos_text, ref_pos)
@@ -93,7 +93,7 @@ private:
 public:
 	CompactedFactorsFastIteratorComparator();
 
-	CompactedFactorsFastIteratorComparator(sd_vector<unsigned long long> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> *_factors, char *_ref_text, unsigned long long _full_size);
+	CompactedFactorsFastIteratorComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size);
 
 	inline bool operator()(const unsigned long long a, const unsigned long long b){
 			unsigned long long start_a = select_factors(a);
@@ -115,7 +115,7 @@ public:
 				} else {
 					factor_a = rank_factors(start_a + i);
 					offset_a = start_a + i - select_factors(factor_a);
-					ref_pos_a = factors->at(factor_a).first + offset_a; 
+					ref_pos_a = factors[factor_a].first + offset_a; 
 				}
 
 				if(last_b.first + 1ULL == start_b + i)
@@ -125,7 +125,7 @@ public:
 				} else {
 					factor_b = rank_factors(start_b + i);
 					offset_b = start_b + i - select_factors(factor_b);
-					ref_pos_b = factors->at(factor_b).first + offset_b; 
+					ref_pos_b = factors[factor_b].first + offset_b; 
 				}
 
 				if( ref_text[ref_pos_a] < ref_text[ref_pos_b] ){
@@ -142,10 +142,10 @@ public:
 class CompactedFactorsFastIteratorReverseComparator : public std::binary_function<unsigned long long, unsigned long long, bool>
 {
 private:
-	sd_vector<unsigned long long>::rank_1_type rank_factors;
-    sd_vector<unsigned long long>::select_1_type select_factors;
-	vector<pair<unsigned long long, unsigned long long>> *factors;
-	char *ref_text;
+	sd_vector<>::rank_1_type rank_factors;
+    sd_vector<>::select_1_type select_factors;
+	vector<pair<unsigned long long, unsigned long long>> factors;
+	const char *ref_text;
 	unsigned long long full_size;
 
 	//	Cache data   									  (pos_text, ref_pos)
@@ -155,7 +155,7 @@ private:
 public:
 	CompactedFactorsFastIteratorReverseComparator();
 
-	CompactedFactorsFastIteratorReverseComparator(sd_vector<unsigned long long> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> *_factors, char *_ref_text, unsigned long long _full_size);
+	CompactedFactorsFastIteratorReverseComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size);
 
 	inline bool operator()(const unsigned long long a, const unsigned long long b){
 		if( a == 0 ){
@@ -184,7 +184,17 @@ public:
 				// Creo que esto tiene sentido, pues el proceso consta de mapear pos = start_X +- i a donde viva en R
 				factor_a = rank_factors(start_a - i);
 				offset_a = start_a - i - select_factors(factor_a); // consultar si tiene sentido
-				ref_pos_a = factors->at(factor_a).first + offset_a; 
+				ref_pos_a = factors[factor_a].first + offset_a; 
+			}
+			if(last_b.first - 1ULL == start_b - i)
+			{
+				ref_pos_b = last_b.second - 1ULL;
+				last_b = make_pair(start_b - i, ref_pos_b);
+			} else {
+				// Creo que esto tiene sentido, pues el proceso consta de mapear pos = start_X +- i a donde viva en R
+				factor_b = rank_factors(start_b - i);
+				offset_b = start_b - i - select_factors(factor_b); // consultar si tiene sentido
+				ref_pos_b = factors[factor_b].first + offset_b; 
 			}
 			if( ref_text[ref_pos_a] < ref_text[ref_pos_b] ){
 				return true;
