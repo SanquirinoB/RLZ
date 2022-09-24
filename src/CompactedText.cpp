@@ -37,7 +37,7 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 			++len;
 		}
 		else{
-			cerr << "CompactedText - Warning, omiting invalid char (" << text[i] << ")\n";
+			cerr << "CompactedText - Warning, omiting invalid i:" << i << " char (" << text[i] << ")\n";
 			continue;
 		}
 		value <<= (in_pos * 2);

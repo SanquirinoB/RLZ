@@ -535,9 +535,9 @@ void ReferenceIndexBasic::load(const char *ref_file){
 	}
 	
 	lector.read((char*)(&largo), sizeof(int));
-	cout<<"ReferenceIndexBasic::load - cargando referencia de "<<largo<<" chars desde \""<<ref_file<<"\"\n";
+	cout<<"ReferenceIndexBasic::load - cargando referencia de "<<largo<<" chars desde \""<<ref_file<<endl;
 	
-	ref = new unsigned char[largo + 1];
+	ref = new unsigned char[largo + 1ULL];
 	lector.read((char*)ref, largo);
 	ref[largo] = 0;
 	arr = new unsigned long long[largo];
