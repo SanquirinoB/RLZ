@@ -113,9 +113,13 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		arr_x_original[i] = i;
 	}
 
-	sd_vector<>* starts = new sd_vector<>(factors_start.begin(), factors_start.end());
-	CompactedFactorsFastIteratorReverseComparator comp_rev(starts, factors, (const char*) _ref_text, len_text);
+	sd_vector<> starts = sd_vector<>(factors_start.begin(), factors_start.end());
+
+	CompactedFactorsFastIteratorReverseComparator comp_rev(&starts, factors, (const char*) _ref_text, len_text);
+
 	stable_sort(arr_x_original.begin(), arr_x_original.end(), comp_rev);
+	cout << "[DEBUG] Sort X finished" << endl;
+	
 	arr_x = int_vector<>(n_factors);
 	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x[i] = arr_x_original[i];
@@ -138,8 +142,10 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		arr_y_original[i] = i;
 	}
 
-	CompactedFactorsFastIteratorComparator comp(starts, factors, (const char*) _ref_text, len_text);
+	CompactedFactorsFastIteratorComparator comp(&starts, factors, (const char*) _ref_text, len_text);
+
 	stable_sort(arr_y_original.begin(), arr_y_original.end(), comp);
+	cout << "[DEBUG] Sort X finished" << endl;
 	
 	arr_y = int_vector<>(n_factors);
 	int_vector<> arr_y_inv(n_factors);
