@@ -40,6 +40,8 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 			cerr << "CompactedText - Warning, omiting invalid i:" << i << " char (" << text[i] << ")\n";
 			continue;
 		}
+
+		cout << "[DEBUG] Constructor: len = " << len << endl;
 		value <<= (in_pos * 2);
 //		cout << "CompactedText - Adding " << (unsigned long long)value << " (to " << (unsigned long long)bytes[out_pos] << " from " << text[i] << ")\n";
 		bytes[out_pos] += value;
@@ -108,10 +110,10 @@ void CompactedText::save(fstream *writer){
 		cerr << "CompactedText::save - Error in fstream\n";
 		return;
 	}
-//	cout << "CompactedText::save - len: " << len << "\n";
-	writer->write((char*)&len, sizeof(long long));
-	unsigned long long n_bytes = len/4;
-	if( n_bytes*4 < len ){
+	cout << "CompactedText::save - len: " << len << endl;
+	writer->write((char*)&len, sizeof(unsigned long long));
+	unsigned long long n_bytes = len/4ULL;
+	if( n_bytes*4ULL < len ){
 		++n_bytes;
 	}
 //	cout << "CompactedText::save - n_bytes: " << n_bytes << "\n";
@@ -127,13 +129,13 @@ void CompactedText::load(fstream *reader){
 	if( bytes != NULL ){
 		delete [] bytes;
 	}
-	reader->read((char*)&len, sizeof(long long));
-//	cout << "CompactedText::load - len: " << len << "\n";
-	unsigned long long n_bytes = len/4;
-	if( n_bytes*4 < len ){
+	reader->read((char*)&len, sizeof(unsigned long long));
+	cout << "CompactedText::load - len: " << len << endl;
+	unsigned long long n_bytes = len/4ULL;
+	if( n_bytes*4ULL < len ){
 		++n_bytes;
 	}
-//	cout << "CompactedText::load - n_bytes: " << n_bytes << "\n";
+	cout << "CompactedText::load - n_bytes: " << n_bytes << endl;
 	bytes = new unsigned char[n_bytes];
 	reader->read((char*)bytes, n_bytes);
 }

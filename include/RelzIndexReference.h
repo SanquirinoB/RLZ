@@ -85,6 +85,8 @@ public:
 	void save(const string &file_base);
 	
 	void load(const string &file_base);
+
+	unsigned long long RefLen();
 	
 	unsigned long long querytime_p1;
 	unsigned long long querytime_p2;

@@ -36,6 +36,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	sort(factors_sort.begin(), factors_sort.end());
 	cout << "RelzIndexReference - Factors Sorted prepared in " << timer.getMilisec() << endl;
 	timer.reset();
+
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 //	cout << "Factors Sorted: " << endl;
 //	for( pair<unsigned long long, pair<unsigned long long, unsigned long long> > factor : factors_sort ){
 //		cout << "(" << factor.first << ", " << factor.second.first << ", " << factor.second.second << ")" << endl;
@@ -57,6 +59,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 			--i;
 		}
 	}
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	cout << "RelzIndexReference - Vector S prepared in " << timer.getMilisec() << endl;
 	timer.reset();
 	
@@ -72,6 +76,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		pi[i] = factors_sort[i].second.second;
 		pi_inv[ factors_sort[i].second.second ] = i;
 	}
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 	
 	cout << "RelzIndexReference - PI prepared in " << timer.getMilisec() << endl;
 	timer.reset();
@@ -82,6 +87,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		ez[i] = factors_sort[i].second.first;
 	}
 	rmq = rmq_type(&ez);
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 	
 	// Bit vector B (inicio de las frases en texto)
 	cout << "RelzIndexReference - Preparing Vector B" << endl;
@@ -92,6 +98,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		arr_b[ pos_text ] = 1;
 		pos_text += len;
 	}
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 	cout << "RelzIndexReference - Vector B prepared in " << timer.getMilisec() << endl;
 	timer.reset();
 
@@ -101,13 +108,18 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	
 	// Construccion del FM Index (aunque use el SA original para la compresion, esto es para la busqueda)
 	// Construccion con datos en memoria, en un string
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	cout << "RelzIndexReference - Preparing fm_index\n";
 	construct_im(fm_index, _ref_text, 1);
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	cout << "RelzIndexReference - fm_index prepared in " << timer.getMilisec() << "\n";
 	timer.reset();
 	
 	// Preparacion de permutaciones X e Y
 	cout << "RelzIndexReference - Preparing arr X" << endl;
+	
 	vector<unsigned long long> arr_x_original(n_factors);
 	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x_original[i] = i;
@@ -124,6 +136,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	for( unsigned long long i = 0; i < n_factors; ++i ){
 		arr_x[i] = arr_x_original[i];
 	}
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	
 //	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_x[" << i << "]: " << arr_x[i] << " -> ";
@@ -163,6 +177,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 //		cout << " (" << it.length() << ")" << endl;
 //	}
 //	cout << "-----" << endl;
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	
 	cout << "RelzIndexReference - X & Y prepared in " << timer.getMilisec() << endl;
 	timer.reset();
@@ -173,6 +189,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		values_wt[i] = arr_y_inv[ arr_x[ i ] ];
 	}
 	construct_im(wt, values_wt);
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
+
 	cout << "RelzIndexReference - WT prepared in " << timer.getMilisec() << endl;
 	timer.reset();
 	
@@ -193,6 +211,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	sdsl::util::bit_compress(pi_inv);
 	sdsl::util::bit_compress(arr_x);
 	sdsl::util::bit_compress(arr_y);
+	cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 	
 	cout << "RelzIndexReference - End" << endl;
 	
@@ -203,6 +222,11 @@ RelzIndexReference::~RelzIndexReference(){
 		delete ref_text;
 		ref_text = NULL;
 	}
+}
+
+unsigned long long RelzIndexReference::RefLen()
+{
+	return ref_text->length();
 }
 
 void RelzIndexReference::findTimes(const string &pattern, vector<unsigned long long> &results){
@@ -467,6 +491,7 @@ pair<unsigned long long, unsigned long long> RelzIndexReference::getRangeX(const
 	while(l < h){
 		m = l + ((h-l)>>1);
 		if (level < LEVEL_BINARY_SEARCH) { 
+			cout << "m = " << m << endl;
                     fm = arr_x[m]; level++;
                 } else
 		    fm = arr_y[wt[m]];
