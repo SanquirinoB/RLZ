@@ -28,31 +28,22 @@ CompactedFactorsFastIteratorComparator::CompactedFactorsFastIteratorComparator()
 	// factors_starts = NULL;
 	// factors = NULL;
 	ref_text = NULL;
-	full_size = 0;
 }
 
 CompactedFactorsFastIteratorReverseComparator::CompactedFactorsFastIteratorReverseComparator(){
 	// factors_starts = NULL;
 	// factors = NULL;
 	ref_text = NULL;
-	full_size = 0;
 }
 
-CompactedFactorsFastIteratorComparator::CompactedFactorsFastIteratorComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size){
-	// factors_starts = _factors_starts;
-	rank_factors = sd_vector<>::rank_1_type(_factors_starts);
-    select_factors = sd_vector<>::select_1_type(_factors_starts);
+CompactedFactorsFastIteratorComparator::CompactedFactorsFastIteratorComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text){
 	factors = _factors;
+	n_factors = _factors.size();
 	ref_text = _ref_text;
-	full_size = _full_size;
 }
 
-CompactedFactorsFastIteratorReverseComparator::CompactedFactorsFastIteratorReverseComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size){
-	// factors_starts = _factors_starts;
-	rank_factors = sd_vector<>::rank_1_type(_factors_starts);
-    select_factors = sd_vector<>::select_1_type(_factors_starts);
+CompactedFactorsFastIteratorReverseComparator::CompactedFactorsFastIteratorReverseComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text){
 	factors = _factors;
 	ref_text = _ref_text;
-	full_size = _full_size;
 }
 

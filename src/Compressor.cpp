@@ -341,7 +341,7 @@ bool Compressor::realCompress(const char *in_file, unsigned long long n_threads,
 	vector<unsigned long long> vector_thread_block(n_blocks);
 	
 	ThreadCompressData datos_threads[n_threads];
-	for(unsigned long long i = 0; i < n_threads; ++i){
+	for(unsigned int i = 0; i < n_threads; ++i){
 	
 		datos_threads[i].id = i;
 		sprintf(datos_threads[i].file_headers, "%s.%d.headers", master_file, i);

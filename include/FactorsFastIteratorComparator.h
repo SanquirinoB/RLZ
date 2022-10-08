@@ -43,6 +43,7 @@ public:
 };
 
 class FactorsFastIteratorReverseComparator : public std::binary_function<unsigned long long, unsigned long long, bool> {
+
 private:
 	vector<unsigned long long> *factors_starts;
 	char *full_text;
@@ -77,178 +78,147 @@ public:
 	}
 };
 
+
 class CompactedFactorsFastIteratorComparator : public std::binary_function<unsigned long long, unsigned long long, bool>
 {
 private:
-	sd_vector<>::rank_1_type rank_factors;
-    sd_vector<>::select_1_type select_factors;
 	vector<pair<unsigned long long, unsigned long long>> factors;
+	unsigned long long n_factors;
 	const char *ref_text;
-	unsigned long long full_size;
-
-	//	Cache data   									  (pos_text, ref_pos)
-	pair<unsigned long long, unsigned long long> last_a = make_pair(0ULL, 0ULL);
-	pair<unsigned long long, unsigned long long> last_b = make_pair(0ULL, 0ULL);
 
 public:
 	CompactedFactorsFastIteratorComparator();
 
-	CompactedFactorsFastIteratorComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size);
+	CompactedFactorsFastIteratorComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text);
 
 	inline bool operator()(const unsigned long long _a, const unsigned long long _b){
-		unsigned long long a = _a + 1ULL;
-		unsigned long long b = _b + 1ULL;
-		// cout << "a,b: " << a << "," << b << endl;
-
-		if( a == 1 ){
+		unsigned long long a = _a;
+		unsigned long long b = _b;
+		bool is_last = false;
+		// Tanto a y b son indices que reflejan el a-esimo y el b-esimo factor
+		// Entonces el primer factor siembre ira antes que cualquier otro
+		if( a == 0 ){
 			return true;
 		}
-		if( b == 1){
+		if( b == 0){
 			return false;
 		}
+		// Si no es el caso, entonces debemos ocurrir en que posicion ocurre mi factor y el que viene despues de mi
+		// Tanto para a como b
+		// (!) Caso borde: a y b son el ultimo
+			// Da igual cual sea el ultimo, cuando terminemos de procesar el mas corto, no seguiremos consultando la siguiente frase
+		if (a == n_factors || b == n_factors)
+		{
+			is_last = true;
+		}
 
-		unsigned long long start_a = select_factors(a);
-		unsigned long long start_b = select_factors(b);
-		// cout << "s_a, s_b: " << start_a << "," << start_b << endl;
+		pair<unsigned long long, unsigned long long> f_a = factors[a];
+		pair<unsigned long long, unsigned long long> f_b = factors[b];
+		unsigned long long i_trigger;
 
-		unsigned long long len_a = full_size - (start_a + 1);
-		unsigned long long len_b = full_size - (start_b + 1);
-		// cout << "l_a, l_b: " << len_a << "," << len_b << endl;
-
-		// Helper
-		unsigned long long ref_pos_a, factor_a, offset_a;
-		unsigned long long ref_pos_b, factor_b, offset_b;
-
-		for(unsigned long long i = 1; i <= ((len_a < len_b)?len_a:len_b); ++i){
-			unsigned long long start_a_plus_i = start_a + i - 1;
-			unsigned long long start_b_plus_i = start_b + i - 1;
-			// cout << "	i: " << i << endl;
-			// Cached part
-			if(last_a.first + 1ULL == start_a_plus_i)
+		bool isNextA = false;
+		if (f_a.second < f_b.second)
+		{
+			i_trigger = f_a.second;
+			isNextA = true;
+		}
+		else
+		{
+			i_trigger = f_b.second;
+			isNextA = false;
+		}
+		
+		for (unsigned long long i = 0; i <= i_trigger; i++)
+		{
+			// Si terminamos de leer para el largo mas corto
+			if (i == i_trigger)
 			{
-				ref_pos_a = last_a.second + 1ULL;
-				last_a = make_pair(start_a_plus_i, ref_pos_a);
-				// cout << "	cache a: " << ref_pos_a <<  endl;
-			} else {
-				factor_a = rank_factors(start_a_plus_i);
-				offset_a = start_a_plus_i - select_factors(factor_a);
-				ref_pos_a = factors[factor_a].first + offset_a - 1; 
-				last_a = make_pair(start_a_plus_i, ref_pos_a);
-				// cout << "	calc a: " << ref_pos_a << "," << offset_a << "," << factor_a <<  endl;
-
+				// Si ya no quedan factores por leer, se acabo
+				if (is_last) continue;
+				// Sino, tenemos que avanzar la lectura de factor
+				i = 0;
+				// Si debemos avanzar en a
+				if (isNextA)
+				{
+					// Avanzamos el indice y leemos el factor sgte
+					a++;
+					f_a = factors[a];
+					// Y comparamos cual es el largo mas corto actual
+					if (f_a.second < f_b.second - i)
+					{
+						i_trigger = f_a.second;
+						isNextA = true;
+					}
+					else
+					{
+						i_trigger = f_b.second - i;
+						isNextA = false;
+					}
+				}
+				else
+				{
+					// Avanzamos el indice y leemos el factor sgte
+					b++;
+					f_b = factors[b];
+					// Y comparamos cual es el largo mas corto actual
+					if (f_a.second - i < f_b.second)
+					{
+						i_trigger = f_a.second - i;
+						isNextA = true;
+					}
+					else
+					{
+						i_trigger = f_b.second;
+						isNextA = false;
+					}
+				}
+				if (a == n_factors || b == n_factors) is_last = true;
 			}
-
-			if(last_b.first + 1ULL == start_b_plus_i)
-			{
-				ref_pos_b = last_b.second + 1ULL;
-				last_b = make_pair(start_b_plus_i, ref_pos_b);
-				// cout << "	cache b: " << ref_pos_b <<  endl;
-
-			} else {
-				factor_b = rank_factors(start_b_plus_i);
-				offset_b = start_b_plus_i - select_factors(factor_b);
-				ref_pos_b = factors[factor_b].first + offset_b - 1; 
-				last_b = make_pair(start_b_plus_i, ref_pos_b);
-				// cout << "	calc b: " << ref_pos_b << "," << offset_b << "," << factor_b <<  endl;
-
-			}
-
-			if( ref_text[ref_pos_a] < ref_text[ref_pos_b] ){
+			// Si queda por leer
+			if( ref_text[ f_a.first + i ] < ref_text[ f_b.first + i ] ){
 				return true;
 			}
-			if( ref_text[ref_pos_a] > ref_text[ref_pos_b] ){
+			if( ref_text[ f_a.first + i ] > ref_text[ f_b.first + i ] ){
 				return false;
 			}
 		}
-		return (len_a < len_b);
+		// Si fueron iguales, nos quedamos con el mas corto
+		// (!) Duda: Aqui salia una comparacion de largos, pero si a y b son indices de factores, necesariamente lo de abajo es equivalente
+		return (_a < _b);
 	}
 };
 
 class CompactedFactorsFastIteratorReverseComparator : public std::binary_function<unsigned long long, unsigned long long, bool>
 {
 private:
-	sd_vector<>::rank_1_type rank_factors;
-    sd_vector<>::select_1_type select_factors;
 	vector<pair<unsigned long long, unsigned long long>> factors;
 	const char *ref_text;
-	unsigned long long full_size;
-
-	//	Cache data   									  (pos_text, ref_pos)
-	pair<unsigned long long, unsigned long long> last_a = make_pair(0ULL, 0ULL);
-	pair<unsigned long long, unsigned long long> last_b = make_pair(0ULL, 0ULL);
 
 public:
 	CompactedFactorsFastIteratorReverseComparator();
 
-	CompactedFactorsFastIteratorReverseComparator(sd_vector<> *_factors_starts, vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text, unsigned long long _full_size);
+	CompactedFactorsFastIteratorReverseComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text);
 
-	inline bool operator()(const unsigned long long _a, const unsigned long long _b){
-		unsigned long long a = _a + 1ULL;
-		unsigned long long b = _b + 1ULL;
-		// cout << "a,b: " << a << "," << b << endl;
-
-		if( a == 1 ){
+	inline bool operator()(const unsigned long long a, const unsigned long long b){
+		if( a == 0 ){
 			return true;
 		}
-		if( b == 1){
+		if( b == 0){
 			return false;
 		}
+		// Recuperamos el prefijo que parte en a-1 y termina en a, analogo b
+		pair<unsigned long long, unsigned long long> f_a_minus = factors[a - 1];
+		pair<unsigned long long, unsigned long long> f_b_minus = factors[b - 1];
+		unsigned long long start_a = f_a_minus.first + f_a_minus.second - 1;
+		unsigned long long start_b = f_b_minus.first + f_b_minus.second - 1;
+		unsigned long long len_a = f_a_minus.second;
+		unsigned long long len_b = f_b_minus.second;
 
-		unsigned long long select_a = select_factors(a);
-		unsigned long long select_b = select_factors(b);
-
-		unsigned long long start_a = select_a - 1;
-		unsigned long long start_b = select_b - 1;
-		// cout << "s_a, s_b: " << start_a << "," << start_b << endl;
-
-		unsigned long long len_a = select_a - select_factors(a-1);
-		unsigned long long len_b = select_b - select_factors(b-1);
-		// cout << "l_a, l_b: " << len_a << "," << len_b << endl;
-
-		// Helper
-		unsigned long long ref_pos_a, factor_a, offset_a;
-		unsigned long long ref_pos_b, factor_b, offset_b;
-
-		for(unsigned long long i = 1; i <= ((len_a < len_b)?len_a:len_b); ++i){
-			unsigned long long start_a_minus_i = start_a - (i - 1);
-			unsigned long long start_b_minus_i = start_b - (i - 1);
-
-			// cout << "	i: " << i << endl;
-			// Cached part
-			if(last_a.first - 1ULL == start_a_minus_i)
-			{
-				ref_pos_a = last_a.second - 1ULL;
-				last_a = make_pair(start_a_minus_i, ref_pos_a);
-				// cout << "	cache a: " << ref_pos_a <<  endl;
-			} else {
-				// Creo que esto tiene sentido, pues el proceso consta de mapear pos = start_X +- i a donde viva en R
-				factor_a = rank_factors(start_a_minus_i);
-				offset_a = start_a_minus_i - select_factors(factor_a); // consultar si tiene sentido
-				ref_pos_a = factors[factor_a].first + offset_a - 1; 
-				last_a = make_pair(start_a_minus_i, ref_pos_a);
-				// cout << "	calc a: " << ref_pos_a << "," << offset_a << "," << factor_a <<  endl;
-
-			}
-			if(last_b.first - 1ULL == start_b_minus_i)
-			{
-				ref_pos_b = last_b.second - 1ULL;
-				last_b = make_pair(start_b_minus_i, ref_pos_b);
-				// cout << "	cache b: " << ref_pos_b <<  endl;
-
-			} else {
-				// Creo que esto tiene sentido, pues el proceso consta de mapear pos = start_X +- i a donde viva en R
-				factor_b = rank_factors(start_b_minus_i);
-				offset_b = start_b_minus_i - select_factors(factor_b); // consultar si tiene sentido
-				ref_pos_b = factors[factor_b].first + offset_b - 1; 
-				last_b = make_pair(start_b_minus_i, ref_pos_b);
-				// cout << "	calc b: " << ref_pos_b << "," << offset_b << "," << factor_b <<  endl;
-
-
-			}
-			if( ref_text[ref_pos_a] < ref_text[ref_pos_b] ){
+		for(unsigned long long i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
+			if( ref_text[ start_a - i ] < ref_text[ start_b - i ] ){
 				return true;
 			}
-			if( ref_text[ref_pos_a] > ref_text[ref_pos_b] ){
+			if( ref_text[ start_a - i ] > ref_text[ start_b - i ] ){
 				return false;
 			}
 		}

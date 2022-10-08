@@ -41,7 +41,7 @@ CompactedText::CompactedText(const char *text, unsigned long long _len){
 			continue;
 		}
 
-		cout << "[DEBUG] Constructor: len = " << len << endl;
+		// cout << "[DEBUG] Constructor: len = " << len << endl;
 		value <<= (in_pos * 2);
 //		cout << "CompactedText - Adding " << (unsigned long long)value << " (to " << (unsigned long long)bytes[out_pos] << " from " << text[i] << ")\n";
 		bytes[out_pos] += value;
