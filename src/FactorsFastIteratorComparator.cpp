@@ -38,7 +38,7 @@ CompactedFactorsFastIteratorReverseComparator::CompactedFactorsFastIteratorRever
 
 CompactedFactorsFastIteratorComparator::CompactedFactorsFastIteratorComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text){
 	factors = _factors;
-	n_factors = _factors.size();
+	n_factors = _factors.size() - 1;
 	ref_text = _ref_text;
 }
 
