@@ -97,12 +97,10 @@ public:
 		bool is_last = false;
 		// Tanto a y b son indices que reflejan el a-esimo y el b-esimo factor
 		// Entonces el primer factor siembre ira antes que cualquier otro
-		if( a == 0 ){
-			return true;
-		}
-		if( b == 0){
-			return false;
-		}
+		if( a == 0) return true;
+		if( b == 0) return false;
+		if( a == b) return false;
+		
 		// Si no es el caso, entonces debemos ocurrir en que posicion ocurre mi factor y el que viene despues de mi
 		// Tanto para a como b
 		// (!) Caso borde: a y b son el ultimo
@@ -173,6 +171,9 @@ public:
 					}
 				}
 				if (a == n_factors || b == n_factors) is_last = true;
+				// Si resulta que estamos leyendo desde el mismo punto, son necesariamente iguales a partir de ahora
+				// Asi que nos quedamos con el resultado de (_a < _b)
+				if (a == b) break;
 			}
 			// Si queda por leer
 			if( ref_text[ f_a.first + i ] < ref_text[ f_b.first + i ] ){
@@ -200,12 +201,10 @@ public:
 	CompactedFactorsFastIteratorReverseComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text);
 
 	inline bool operator()(const unsigned long long a, const unsigned long long b){
-		if( a == 0 ){
-			return true;
-		}
-		if( b == 0){
-			return false;
-		}
+		if( a == 0) return true;
+		if( b == 0) return false;
+		if( a == b) return false;
+
 		// Recuperamos el prefijo que parte en a-1 y termina en a, analogo b
 		pair<unsigned long long, unsigned long long> f_a_minus = factors[a - 1];
 		pair<unsigned long long, unsigned long long> f_b_minus = factors[b - 1];
