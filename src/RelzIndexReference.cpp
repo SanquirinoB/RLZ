@@ -485,7 +485,6 @@ pair<unsigned long long, unsigned long long> RelzIndexReference::getRangeX(const
 	while(l < h){
 		m = l + ((h-l)>>1);
 		if (level < LEVEL_BINARY_SEARCH) { 
-			cout << "m = " << m << endl;
                     fm = arr_x[m]; level++;
                 } else
 		    fm = arr_y[wt[m]];
