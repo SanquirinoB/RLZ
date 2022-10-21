@@ -128,16 +128,21 @@ public:
 		
 		for (unsigned long long i = 0; i <= i_trigger; i++)
 		{
-			// Si terminamos de leer para el largo mas corto
-			if (i == i_trigger)
+			// Si terminamos de leer para el largo mas corto o coincidimos con algun punto en la referencia
+			if (i == i_trigger || ((f_a.first + i) == (f_b.first + i)))
 			{
 				// Si ya no quedan factores por leer, se acabo
 				if (is_last) continue;
-				// Sino, tenemos que avanzar la lectura de factor
-				i = 0;
+				// Sino, tenemos que avanzar la lectura en base al factor mas corto
 				// Si debemos avanzar en a
 				if (isNextA)
 				{
+					// Si estamos avanzando por coincidencia de punto
+					if((f_a.first + i) == (f_b.first + i))
+					{
+						// Adelantamos la lectura equivalente al factor de a
+						f_b.first += f_a.second - 1;
+					}
 					// Avanzamos el indice y leemos el factor sgte
 					a++;
 					f_a = factors[a];
@@ -155,6 +160,12 @@ public:
 				}
 				else
 				{
+					// Si estamos avanzando por coincidencia de punto
+					if((f_a.first + i) == (f_b.first + i))
+					{
+						// Adelantamos la lectura equivalente al factor de b
+						f_a.first += f_b.second - 1;
+					}
 					// Avanzamos el indice y leemos el factor sgte
 					b++;
 					f_b = factors[b];
@@ -170,8 +181,11 @@ public:
 						isNextA = false;
 					}
 				}
+				// Reinicio i
+				i = 0;
+				// Si alguno de los factores es terminal, notificamos el estado de final
 				if (a == n_factors || b == n_factors) is_last = true;
-				// Si resulta que estamos leyendo desde el mismo punto, son necesariamente iguales a partir de ahora
+				// Si resulta que estamos leyendo desde el mismo punto en LZ(S|R), son necesariamente iguales a partir de ahora
 				// Asi que nos quedamos con el resultado de (_a < _b)
 				if (a == b) break;
 			}
