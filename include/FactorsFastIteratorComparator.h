@@ -137,12 +137,17 @@ public:
 			i_trigger = f_b.second;
 			isNextA = false;
 		}
-		
+		// Para detectar cuando observamos la misma posicion dentro de la referencia
+		bool pointCoincidence = false;
+		unsigned long long delta = 0;
+
 		for (unsigned long long i = 0; i <= i_trigger; i++)
 		{
 			// Si terminamos de leer para el largo mas corto o coincidimos con algun punto en la referencia
-			if (i == i_trigger || ((f_a.first + i) == (f_b.first + i)))
+			pointCoincidence = (f_a.first + i) == (f_b.first + i);
+			if (i == i_trigger || pointCoincidence)
 			{
+				delta = pointCoincidence? 0:i;
 				// Si ya no quedan factores por leer, se acabo
 				if (is_last) continue;
 				// Sino, tenemos que avanzar la lectura en base al factor mas corto
@@ -150,10 +155,10 @@ public:
 				if (isNextA)
 				{
 					// Si estamos avanzando por coincidencia de punto
-					if((f_a.first + i) == (f_b.first + i))
+					if(pointCoincidence)
 					{
 						// Adelantamos la lectura equivalente al factor de a
-						f_b.first += f_a.second - 1;
+						f_b.first += f_a.second;
 						// Y actualizamos el largo del factor
 						f_b.second -= f_a.second;
 					}
@@ -161,24 +166,24 @@ public:
 					a++;
 					f_a = factors[a];
 					// Y comparamos cual es el largo mas corto actual
-					if (f_a.second < f_b.second - i)
+					if (f_a.second < f_b.second - delta)
 					{
 						i_trigger = f_a.second;
 						isNextA = true;
 					}
 					else
 					{
-						i_trigger = f_b.second - i;
+						i_trigger = f_b.second - delta;
 						isNextA = false;
 					}
 				}
 				else
 				{
 					// Si estamos avanzando por coincidencia de punto
-					if((f_a.first + i) == (f_b.first + i))
+					if(pointCoincidence)
 					{
 						// Adelantamos la lectura equivalente al factor de b
-						f_a.first += f_b.second - 1;
+						f_a.first += f_b.second;
 						// Y actualizamos el largo del factor
 						f_a.second -= f_b.second;
 					}
@@ -186,9 +191,9 @@ public:
 					b++;
 					f_b = factors[b];
 					// Y comparamos cual es el largo mas corto actual
-					if (f_a.second - i < f_b.second)
+					if (f_a.second - delta < f_b.second)
 					{
-						i_trigger = f_a.second - i;
+						i_trigger = f_a.second - delta;
 						isNextA = true;
 					}
 					else
