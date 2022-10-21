@@ -110,7 +110,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	construct_im(fm_index, _ref_text, 1);
 	// cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 
-	cout << "RelzIndexReference - fm_index prepared in " << timer.getMilisec() << "\n";
+	cout << "RelzIndexReference - fm_index prepared in " << timer.getMilisec() << endl;
 	timer.reset();
 	
 	// Preparacion de permutaciones X e Y
@@ -131,7 +131,8 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 		arr_x[i] = arr_x_original[i];
 	}
 	// cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
-
+	cout << "RelzIndexReference - arr X prepared in " << timer.getMilisec() << endl;
+	timer.reset();
 	
 //	for( unsigned long long i = 0; i < n_factors; ++i ){
 //		cout << " arr_x[" << i << "]: " << arr_x[i] << " -> ";
@@ -174,7 +175,7 @@ RelzIndexReference::RelzIndexReference(vector<pair<unsigned long long, unsigned 
 	// cout << "[DEBUG] Constructor: len = " << ref_text->length() << endl;
 
 	
-	cout << "RelzIndexReference - X & Y prepared in " << timer.getMilisec() << endl;
+	cout << "RelzIndexReference - arr Y prepared in " << timer.getMilisec() << endl;
 	timer.reset();
 	
 	cout << "RelzIndexReference - Preparing WT" << endl;

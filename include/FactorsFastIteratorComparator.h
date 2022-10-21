@@ -85,8 +85,15 @@ private:
 	vector<pair<unsigned long long, unsigned long long>> factors;
 	unsigned long long n_factors;
 	const char *ref_text;
+	// Contador para comparaciones efectivas
+	long long comp;
+	// Cantidad de coincidencias
+	long long idem;
+	// Cantidad de frases leidas
+	long long f_read;
 
 public:
+
 	CompactedFactorsFastIteratorComparator();
 
 	CompactedFactorsFastIteratorComparator(vector<pair<unsigned long long, unsigned long long>> &_factors, const char *_ref_text);
@@ -95,6 +102,11 @@ public:
 		unsigned long long a = _a;
 		unsigned long long b = _b;
 		bool is_last = false;
+		// EXPERIMENTAL
+		comp = 0;
+		idem = 0;
+		f_read = 0;
+
 		// Tanto a y b son indices que reflejan el a-esimo y el b-esimo factor
 		// Entonces el primer factor siembre ira antes que cualquier otro
 		if( a == 0) return true;
@@ -142,6 +154,8 @@ public:
 					{
 						// Adelantamos la lectura equivalente al factor de a
 						f_b.first += f_a.second - 1;
+						// Y actualizamos el largo del factor
+						f_b.second -= f_a.second;
 					}
 					// Avanzamos el indice y leemos el factor sgte
 					a++;
@@ -165,6 +179,8 @@ public:
 					{
 						// Adelantamos la lectura equivalente al factor de b
 						f_a.first += f_b.second - 1;
+						// Y actualizamos el largo del factor
+						f_a.second -= f_b.second;
 					}
 					// Avanzamos el indice y leemos el factor sgte
 					b++;
@@ -181,6 +197,7 @@ public:
 						isNextA = false;
 					}
 				}
+				f_read++;
 				// Reinicio i
 				i = 0;
 				// Si alguno de los factores es terminal, notificamos el estado de final
@@ -191,14 +208,21 @@ public:
 			}
 			// Si queda por leer
 			if( ref_text[ f_a.first + i ] < ref_text[ f_b.first + i ] ){
+				comp++;
+				cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 				return true;
 			}
 			if( ref_text[ f_a.first + i ] > ref_text[ f_b.first + i ] ){
+				comp++;
+				cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 				return false;
 			}
+			comp++;
+			idem++;
 		}
 		// Si fueron iguales, nos quedamos con el mas corto
 		// (!) Duda: Aqui salia una comparacion de largos, pero si a y b son indices de factores, necesariamente lo de abajo es equivalente
+		cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 		return (_a < _b);
 	}
 };
@@ -208,6 +232,12 @@ class CompactedFactorsFastIteratorReverseComparator : public std::binary_functio
 private:
 	vector<pair<unsigned long long, unsigned long long>> factors;
 	const char *ref_text;
+	// Contador para comparaciones efectivas
+	long long comp;
+	// Cantidad de coincidencias
+	long long idem;
+	// Cantidad de frases leidas
+	long long f_read;
 
 public:
 	CompactedFactorsFastIteratorReverseComparator();
