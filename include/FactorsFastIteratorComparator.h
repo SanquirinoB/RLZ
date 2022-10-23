@@ -103,9 +103,9 @@ public:
 		unsigned long long b = _b;
 		bool is_last = false;
 		// EXPERIMENTAL
-		comp = 0;
-		idem = 0;
-		f_read = 0;
+		// comp = 0;
+		// idem = 0;
+		// f_read = 0;
 
 		// Tanto a y b son indices que reflejan el a-esimo y el b-esimo factor
 		// Entonces el primer factor siembre ira antes que cualquier otro
@@ -189,7 +189,7 @@ public:
 						isNextA = false;
 					}
 				}
-				f_read++;
+				// f_read++;
 				// Reinicio i
 				i = 0;
 				// Si alguno de los factores es terminal, notificamos el estado de final
@@ -198,21 +198,21 @@ public:
 			}
 			// Si queda por leer
 			if( ref_text[ f_a.first + i ] < ref_text[ f_b.first + i ] ){
-				comp++;
-				cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
+				// comp++;
+				// cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 				return true;
 			}
 			if( ref_text[ f_a.first + i ] > ref_text[ f_b.first + i ] ){
-				comp++;
-				cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
+				// comp++;
+				// cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 				return false;
 			}
-			comp++;
-			idem++;
+			// comp++;
+			// idem++;
 		}
 		// Si fueron iguales, nos quedamos con el mas corto
 		// (!) Duda: Aqui salia una comparacion de largos, pero si a y b son indices de factores, necesariamente lo de abajo es equivalente
-		cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
+		// cout << "[CD] " << _a << " " << _b << " " << comp << " " << idem << " " << f_read << endl;
 		return (_a < _b);
 	}
 };
