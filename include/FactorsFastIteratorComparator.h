@@ -246,6 +246,8 @@ public:
 		unsigned long long start_b = f_b_minus.first + f_b_minus.second - 1;
 		unsigned long long len_a = f_a_minus.second;
 		unsigned long long len_b = f_b_minus.second;
+		
+		if(start_a == start_b) return (len_a < len_b);
 
 		for(unsigned long long i = 0; i < ((len_a < len_b)?len_a:len_b); ++i){
 			if( ref_text[ start_a - i ] < ref_text[ start_b - i ] ){
